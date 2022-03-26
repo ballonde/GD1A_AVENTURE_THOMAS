@@ -107,6 +107,10 @@
                 this.compteurTete=0;
                 this.teteDisponible=false;
                 this.nouveauJoueur=false;
+                this.coeur=false;
+                this.projectileP;
+                this.boutonFeu;
+                this.afficheScore;
 
         }
         preload(){
@@ -115,6 +119,8 @@
             this.load.image('star', 'assets/star.png');
             this.load.image('bomb', 'assets/bomb.png');
             this.load.image('coffre', 'assets/coffre.png');
+            this.load.image('lootAile', 'assets/loot_mob_aile.png');
+            this.load.image('projectileP', 'assets/projectile_perso.png');
             this.load.image('power_up', 'assets/power_up.png');
             this.load.image('carcasse_hero', 'assets/carcasse_hero.png');
             this.load.spritesheet('argent', 'assets/argent.png',
@@ -137,6 +143,7 @@
 
 
                 this.player = this.physics.add.sprite(100, 450, 'persoGolem').setScale(2);
+                this.player.direction = 'right';  
                 this.player.setCollideWorldBounds(true);
                 this.physics.add.collider( this.player,  this.platforms);
 
@@ -175,6 +182,11 @@
                 repeat: -1
                 });
                 this.cursors = this.input.keyboard.createCursorKeys();
+                this.keys = this.input.keyboard.addKeys({
+                a:  Phaser.Input.Keyboard.KeyCodes.A,
+//                d:  Phaser.Input.Keyboard.KeyCodes.D,
+            });
+            this.boutonFeu = this.input.keyboard.addKey('D'); 
 
                 this.barreVie = this.physics.add.sprite(80,50, 'barreVie').setScale(2);
                 this.barreVie.setScrollFactor(0);
@@ -222,15 +234,22 @@
             this.coffre = this.physics.add.staticGroup();
             this.coffre.create(400, 500, 'coffre').setScale(2);
             this.physics.add.collider(this.player, this.coffre, degat, null, this);
+            this.coffre.vie = 100;
 
             this.argent = this.physics.add.sprite(40, 107, 'argent').setScale(2);
             this.argent.setScrollFactor(0);
-            this.scoreArgent=this.add.text(50,100,':0',{fontSize:'16px',fill:'#000'});
+            this.afficheScore=0;
+            this.scoreArgent=this.add.text(50,100,': 0',{fontSize:'16px',fill:'#000'});
             this.scoreArgent.setScrollFactor(0);
 
             this.carcasse = this.physics.add.staticGroup();
             this.carcasse.create(400, 100, 'carcasse_hero').setScale(2);
 
+            this.projectileP = this.physics.add.group();
+            this.physics.add.collider(this.projectileP, this.coffre, degatMonstre, null, this);
+
+            this.loot = this.physics.add.staticGroup();
+            this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
         }
 
         update(){
@@ -241,6 +260,7 @@
 
             this.player = this.physics.add.sprite(this.player.x, this.player.y, 'persoGolem').setScale(2);
                 this.player.setCollideWorldBounds(true);
+                this.player.direction = 'right';
                 this.physics.add.collider( this.player,  this.platforms);
 
                 this.physics.world.setBounds(0, 0, 1000, 1000);
@@ -298,7 +318,8 @@
             this.cameras.main.startFollow(this.player); 
 
             this.physics.add.collider(this.player, this.coffre, degat, null, this);
-            this.physics.add.collider(this.player, this.carcasse, retourCorps, null, this);
+            this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
+            this.physics.add.collider(this.player, this.power, powerActivate, null, this);
 
                 this.anims.create({
                 key: 'teteup',
@@ -369,11 +390,16 @@
 
     if (this.gameOver){return;}
 
+    if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false) {
+    //if (this.keys.d.isDown){
+        //this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
+        this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
+        tirer(this.player,this.proj);
+        }
+
     if (this.cursors.space.isDown && this.teteDisponible==true){ //si la touche gauche est appuyée
         this.tete=true; //et animation => gauche
         }
-
-
                 if (this.cursors.left.isDown){ 
                     if (this.tete==true){
                         this.player.setVelocityX(-240); //alors vitesse négative en X
@@ -382,6 +408,7 @@
                         //si la touche gauche est appuyée
                     this.player.setVelocityX(-240); //alors vitesse négative en X
                     this.player.anims.play('left', true); //et animation => gauche
+                    this.player.direction = 'left';
                     }
                 }
                 else if (this.cursors.right.isDown){
@@ -391,6 +418,7 @@
                     } else{
                     this.player.setVelocityX(240); //alors vitesse positive en X
                     this.player.anims.play('right', true); //et animation => droite
+                    this.player.direction = 'right';
                     }
                 }
                 else if (this.cursors.up.isDown){
@@ -401,6 +429,7 @@
 
                 this.player.setVelocityY(-240);
                 this.player.anims.play('up', true);
+                this.player.direction = 'up';
                     }
                 }
                 else if (this.cursors.down.isDown){
@@ -410,6 +439,7 @@
                     }else{
                     this.player.setVelocityY(240);
                     this.player.anims.play('down', true);
+                    this.player.direction = 'down';
                     }
                 }
                 else{ // sinon
@@ -428,12 +458,52 @@
             }
 
         };
+        function tirer(player,proj) {
+        // parametres physiques de la balle.
+        //this.projectileP.create(player.x, player.y, 'projectileP').setScale(2);
+        proj.setCollideWorldBounds(true);
+        if (player.direction == 'left') { 
+            proj.setVelocity(-200, 0);
+        }
+        if (player.direction == 'right') {
+            proj.setVelocity(200, 0); 
+        }
+        if (player.direction == 'up') {
+            proj.setVelocity(0, -200);
+        }
+        if (player.direction == 'down') { 
+            proj.setVelocity(0, 200);
+        }
+}  
+
+
+        function recupLoot(player,loot){
+                loot.destroy();
+             }
+
+        function degatMonstre(projectileP,coffre){
+            projectileP.destroy();
+            coffre.vie=coffre.vie-10;
+            if (coffre.vie!=100){
+                coffre.destroy();
+                this.afficheScore=this.afficheScore+10;
+                this.scoreArgent.setText(': ' + this.afficheScore);
+                this.scoreArgent.updateText();
+                //coffre.disableBody(true, true);
+                if (Math.floor(Math.random() * 100)<=20){
+                this.loot.create(coffre.x, coffre.y, 'lootAile');
+                }
+            }
+        }
 
         function retourCorps(player,carcasse){
+            if (this.keys.a.isDown){
                 this.compteurTete=0;
                 this.tete=false;
                 this.nouveauJoueur=true;
                 carcasse.destroy();
+                this.coeur=false;
+            }
         }
 
         function powerActivate(player,power){
