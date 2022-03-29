@@ -5,6 +5,276 @@
  </editorsettings>
  <tileset firstgid="1" name="plaine_asset" tilewidth="32" tileheight="32" tilecount="81" columns="9">
   <image source="assets/plaine_asset.png" width="300" height="300"/>
+  <tile id="0">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="9">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="10">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="11">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="12">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="13">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="14">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="15">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="16">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="17">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="18">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="19">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="21">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="22">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="23">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="24">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="25">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="26">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="27">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="28">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="29">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="30">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="31">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="32">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="33">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="34">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="35">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="36">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="37">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="38">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="39">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="40">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="41">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="42">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="43">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="44">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="45">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="46">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="47">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="48">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="49">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="50">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="51">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="52">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="53">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
+  </tile>
  </tileset>
  <layer id="1" name="Calque 1" width="20" height="20">
   <data encoding="csv">
@@ -33,24 +303,24 @@
  <layer id="2" name="Calque 2" width="20" height="20">
   <data encoding="csv">
 0,0,0,0,0,23,27,27,27,1,2,3,27,27,27,27,27,27,27,27,
-0,0,0,0,23,0,0,0,41,10,11,12,5,27,0,43,0,0,0,27,
-0,0,23,23,0,0,44,0,0,0,0,0,14,35,0,0,0,32,0,27,
-23,23,41,0,31,0,0,0,0,0,0,35,0,32,0,0,0,43,0,27,
-23,40,34,43,0,27,0,0,0,0,0,0,0,0,0,0,0,0,24,27,
-27,35,31,0,0,0,0,0,44,0,44,0,0,0,0,50,0,0,0,27,
-27,0,0,41,0,0,43,0,0,0,0,0,0,0,0,0,0,0,0,27,
-27,43,0,0,0,25,0,0,0,50,0,0,50,27,0,31,0,35,0,27,
-41,0,0,0,31,0,0,0,0,0,0,0,0,0,0,34,4,0,40,27,
-27,0,0,43,0,0,0,42,0,0,31,44,0,0,34,0,13,35,0,27,
-27,44,0,0,0,0,0,0,0,0,0,43,0,26,0,33,33,32,0,27,
-27,0,24,0,5,33,0,0,0,0,0,0,0,50,0,0,0,0,0,27,
-27,0,40,35,14,41,0,27,0,42,0,0,0,0,0,0,0,0,43,27,
-27,0,0,41,37,0,33,0,0,0,32,0,0,0,41,0,0,0,0,27,
-24,0,37,35,41,40,0,0,0,50,0,50,0,0,0,42,0,0,0,27,
-27,0,0,0,37,0,0,0,0,0,0,0,0,0,0,31,43,0,43,27,
-27,0,0,0,0,0,42,0,0,0,0,0,50,0,0,0,0,0,0,23,
-27,0,0,0,0,0,0,0,31,0,0,50,0,0,0,0,0,23,23,23,
-27,0,0,23,23,23,23,0,0,0,0,0,0,0,23,23,23,23,23,23,
+0,0,0,0,23,44,44,44,41,10,11,12,5,27,0,43,0,0,0,27,
+0,0,23,23,44,44,44,44,44,0,0,0,14,35,0,0,0,32,0,27,
+23,23,41,0,31,0,0,0,44,44,0,35,0,32,50,0,0,43,0,27,
+23,40,34,43,43,27,0,43,0,0,0,0,0,0,42,0,50,0,24,27,
+27,35,31,43,43,43,50,43,44,0,44,42,42,42,0,50,0,50,0,27,
+27,0,0,41,43,43,43,50,42,42,42,42,0,0,42,0,42,0,0,27,
+27,43,50,0,43,25,0,50,42,42,42,0,50,27,0,31,0,35,0,27,
+41,0,43,0,31,43,0,50,42,42,0,0,0,0,0,34,4,0,40,27,
+27,0,50,43,0,0,0,42,42,42,31,44,42,42,34,0,13,35,0,27,
+27,44,50,50,50,50,50,0,0,42,50,43,42,26,0,33,33,32,0,27,
+27,50,24,0,5,33,0,0,0,0,42,42,42,50,42,42,0,0,0,27,
+27,50,40,35,14,41,0,27,0,42,0,42,42,42,50,50,42,0,43,27,
+27,50,50,41,37,0,33,0,0,0,32,0,0,42,41,50,0,0,0,27,
+24,0,37,35,41,40,0,44,0,50,0,50,0,0,0,42,50,0,0,27,
+27,44,50,0,37,0,0,0,44,0,50,0,44,44,0,31,43,0,43,27,
+27,44,44,0,44,44,42,0,0,44,50,0,50,44,44,0,44,0,0,23,
+27,0,44,44,44,0,0,0,31,44,44,50,50,44,44,44,44,23,23,23,
+27,0,0,23,23,23,23,0,0,0,44,44,44,44,23,23,23,23,23,23,
 27,27,23,23,23,23,23,23,27,27,27,27,27,23,23,23,23,23,23,23
 </data>
  </layer>
