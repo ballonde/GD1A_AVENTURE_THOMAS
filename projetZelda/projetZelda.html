@@ -9,20 +9,426 @@
     
         <script type="text/javascript">
 
-    class PlayGame extends Phaser.Scene{
+    class Tuto extends Phaser.Scene{
         constructor(){
-            super("playgame");
+            super("Tuto");
+            this.invincible=false;
+            this.compteurInva = 60;
+            this.tete=false;
+            this.compteurTete=0;
+            this.nouveauJoueur=false;
+            this.coeur=false;
+            this.projectileP;
+            this.boutonFeu;
+            this.objetInventaire=[];
+            this.nbElementInventaire=0;
         }
-            preload(){}
-            create(){}
-            update(){}
-    }
+        init(data){
+            this.vieJoueur = data.vieJoueur;
+            this.dash = data.dash;
+            this.afficheScore = data.afficheScore;
+            this.teteDisponible = data.teteDisponible;
+            this.inventaireCle=data.inventaireCle;
+            this.inventaireAile=data.inventaireAile;
+        }
+
+            preload(){
+            this.load.image('donjon_asset', 'assets/donjon.png');
+            this.load.tilemapTiledJSON('carte_tuto', 'carteTuto.json');
+
+
+            this.load.image('inventaireCle', 'assets/inventaireCle.png');
+            this.load.image('inventaireAile', 'assets/inventaireAile.png');
+            this.load.image('lootAile', 'assets/loot_mob_aile.png');
+            this.load.image('projectileP', 'assets/projectile_perso.png');
+            this.load.image('power_up', 'assets/power_up.png');
+            this.load.image('carcasse_hero', 'assets/carcasse_hero.png');
+
+
+            this.load.spritesheet('sentinelleMouv', 'assets/mob_spritesheet_deplacement.png',
+            { frameWidth: 48, frameHeight: 48 });
+            this.load.spritesheet('argent', 'assets/argent.png',
+            { frameWidth: 16, frameHeight: 16 });
+            this.load.spritesheet('persoGolem','assets/planchePersoDeplacement.png',
+            { frameWidth: 48, frameHeight: 32 });
+            this.load.spritesheet('barreVie','assets/barreVie.png',
+            { frameWidth: 80, frameHeight: 32 });
+            this.load.spritesheet('tete','assets/tete_hero_deplacement.png',
+            { frameWidth: 16, frameHeight: 16 });
+            this.load.spritesheet('attackPerso','assets/perso_attack.png',
+            { frameWidth: 16, frameHeight: 16 });
+
+            }
+            create(){
+                this.carteTuto=this.add.tilemap('carte_tuto');
+                this.tileset = this.carteTuto.addTilesetImage(
+                    "donjon",
+                    "donjon_asset"
+                    );  
+                this.plateformes = this.carteTuto.createStaticLayer(
+                    "sol",
+                    this.tileset
+                    ); 
+                this.obstacles = this.carteTuto.createStaticLayer(
+                    "obstacles",
+                    this.tileset
+                    ); 
+
+                this.plateformes.setScale(2);
+                this.obstacles.setScale(2);
+
+                this.obstacles.setCollisionByProperty({ estSolide: true});
+
+
+                this.player = this.physics.add.sprite(100, 450, 'persoGolem').setScale(2);
+                this.player.direction = 'right';  
+                this.player.setCollideWorldBounds(true);
+                this.physics.add.collider(this.player, this.obstacles);
+
+                this.physics.world.setBounds(0, 0, 1280, 1000);
+                this.cameras.main.setBounds(0, 0, 1280, 1000);
+                this.cameras.main.startFollow(this.player); 
+
+                this.anims.create({
+                    key: 'left',
+                    frames: this.anims.generateFrameNumbers('persoGolem', {start:14,end:20}),
+                    frameRate: 10,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'turn',
+                    frames: this.anims.generateFrameNumbers('persoGolem', {start:28,end:34}),
+                    frameRate: 10,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'right',
+                    frames: this.anims.generateFrameNumbers('persoGolem', {start:21,end:27}),
+                    frameRate: 10,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'up',
+                    frames: this.anims.generateFrameNumbers('persoGolem', {start:7,end:13}),
+                    frameRate: 10,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'down',
+                    frames: this.anims.generateFrameNumbers('persoGolem', {start:0,end:6}),
+                    frameRate: 10,
+                    repeat: -1
+                });
+
+                this.anims.create({
+                    key: 'attackdown',
+                    frames: this.anims.generateFrameNumbers('attackPerso', {start:8,end:11}),
+                    frameRate: 5,
+                    repeat: -1
+                });
+
+
+                this.cursors = this.input.keyboard.createCursorKeys();
+                this.keys = this.input.keyboard.addKeys({
+                    a:  Phaser.Input.Keyboard.KeyCodes.A,
+                    d:  Phaser.Input.Keyboard.KeyCodes.D,
+                    e:  Phaser.Input.Keyboard.KeyCodes.E,
+                });
+
+                this.barreVie = this.physics.add.sprite(80,50, 'barreVie').setScale(2);
+                this.barreVie.setScrollFactor(0);
+                this.anims.create({
+                    key: 'barreVie6',
+                    frames: [ { key: 'barreVie', frame: 0 } ],
+                    frameRate: 20
+                });
+                this.anims.create({
+                    key: 'barreVie5',
+                    frames: [ { key: 'barreVie', frame: 1 } ],
+                    frameRate: 20
+                });
+                this.anims.create({
+                    key: 'barreVie4',
+                    frames: [ { key: 'barreVie', frame: 2 } ],
+                    frameRate: 20
+                });
+                this.anims.create({
+                    key: 'barreVie3',
+                    frames: [ { key: 'barreVie', frame: 3 } ],
+                    frameRate: 20
+                });
+                this.anims.create({
+                    key: 'barreVie2',
+                    frames: [ { key: 'barreVie', frame: 4 } ],
+                    frameRate: 20
+                });
+                this.anims.create({
+                    key: 'barreVie1',
+                    frames: [ { key: 'barreVie', frame: 5 } ],
+                    frameRate: 20
+                });
+                this.anims.create({
+                    key: 'barreVie0',
+                    frames: [ { key: 'barreVie', frame: 6 } ],
+                    frameRate: 20
+                });
+
+            this.sentinelles = this.physics.add.group();
+            this.sentinelle = this.physics.add.sprite(300,300, 'sentinelleMouv').setScale(2);
+            this.sentinelles.add(this.sentinelle);
+            this.sentinelles.vie=100;
+            this.sentinelles.direction='null';
+            this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+            this.anims.create({
+                key: 'sentinelleUp',
+                frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:12,end:15}),
+                frameRate: 10,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'sentinelleDown',
+                frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:8,end:11}),
+                frameRate: 10,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'sentinelleLeft',
+                frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:4,end:7}),
+                frameRate: 10,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'sentinelleRight',
+                frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:0,end:3}),
+                frameRate: 10,
+                repeat: -1
+            });
+           this.anims.create({
+                key: 'sentinelleIdle',
+                frames: [ { key: 'sentinelleMouv', frame: 8 } ],
+                frameRate: 20
+            });
+            this.carcasse = this.physics.add.staticGroup();
+            this.power = this.physics.add.staticGroup();
+            this.power.create(600, 500, 'power_up').setScale(2);
+            this.physics.add.overlap(this.player, this.power, passage, null, this);
+
+            this.argent = this.physics.add.sprite(40, 107, 'argent').setScale(2);
+            this.argent.setScrollFactor(0);
+            this.afficheScore=0;
+            this.scoreArgent=this.add.text(50,100,': 0',{fontSize:'16px',fill:'#000'});
+            this.scoreArgent.setScrollFactor(0);
+
+            this.projectileP = this.physics.add.group();
+            this.physics.add.collider(this.projectileP, this.obstacles, cleanProj, null, this);
+            this.physics.add.collider(this.projectileP, this.sentinelles, degatMonstre, null, this);
+
+            this.loot = this.physics.add.staticGroup();
+            this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
+
+            this.anims.create({
+                key: 'teteup',
+                frames: this.anims.generateFrameNumbers('tete', {start:0,end:7}),
+                frameRate: 15,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'tetedown',
+                frames: this.anims.generateFrameNumbers('tete', {start:8,end:15}),
+                frameRate: 15,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'teteleft',
+                frames: this.anims.generateFrameNumbers('tete', {start:16,end:23}),
+                frameRate: 15,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'teteright',
+                frames: this.anims.generateFrameNumbers('tete', {start:24,end:31}),
+                frameRate: 15,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'teteturn',
+                frames: [ { key: 'tete', frame: 8 } ],
+                frameRate: 10,
+                repeat: -1
+            });
+        }
+
+        update(){
+
+            if (this.inventaireCle==true){
+                this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireCle').setScale(2).setDepth(0);
+                this.imgInventaire.setScrollFactor(0);
+                this.nbElementInventaire=this.nbElementInventaire+1;
+            }
+            if (this.inventaireAile==true){
+                this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireAile').setScale(2).setDepth(0);
+                this.imgInventaire.setScrollFactor(0);
+                this.nbElementInventaire=this.nbElementInventaire+1;
+            }
+
+            if (this.nouveauJoueur==true){
+                this.nouveauJoueur=false;
+                this.player.destroy();
+
+                this.player = this.physics.add.sprite(this.player.x, this.player.y, 'persoGolem').setScale(2);
+                this.player.setCollideWorldBounds(true);
+                this.player.direction = 'right';
+
+                this.physics.world.setBounds(0, 0, 1280, 1000);
+                this.cameras.main.setBounds(0, 0, 1280, 1000);
+                this.cameras.main.startFollow(this.player); 
+
+                this.physics.add.collider(this.player, this.obstacles);
+                this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
+                this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+        }
+
+        if (this.tete==true && this.compteurTete==0){
+            this.compteurTete=1;
+            this.carcasse.create(this.player.x, this.player.y, 'carcasse_hero').setScale(2);
+            this.player.destroy();
+            this.player = this.physics.add.sprite(this.player.x,this.player.y, 'tete').setScale(2);
+            this.player.setCollideWorldBounds(true);
+            this.physics.world.setBounds(0, 0, 1280, 1000);
+            this.cameras.main.setBounds(0, 0, 1280, 1000);
+            this.cameras.main.startFollow(this.player);
+            this.physics.add.collider(this.player, this.obstacles);
+            this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
+            this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
+            this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+        }
+
+        if(this.invincible == true){
+            this.compteurInva-- ;
+            this.player.setTint(0xff0000);
+             if(this.compteurInva == 0){
+                this.compteurInva = 60;
+                this.player.setTint(0xffffff);
+                this.invincible = false ;
+            }
+        }
+
+        if (this.vieJoueur==6){
+            this.barreVie.anims.play('barreVie6', true); //et animation => gauche
+        }
+        if (this.vieJoueur==5){
+            this.barreVie.anims.play('barreVie5', true); //et animation => gauche
+        }
+        if (this.vieJoueur==4){
+            this.barreVie.anims.play('barreVie4', true); //et animation => gauche
+        }
+        if (this.vieJoueur==3){
+            this.barreVie.anims.play('barreVie3', true); //et animation => gauche
+        }
+        if (this.vieJoueur==2){
+            this.barreVie.anims.play('barreVie2', true); //et animation => gauche
+        }
+        if (this.vieJoueur==1){
+            this.barreVie.anims.play('barreVie1', true); //et animation => gauche
+        }
+        if (this.vieJoueur==0){
+            this.barreVie.anims.play('barreVie0', true); //et animation => gauche
+            this.gameOver=true;
+        }
+
+        if (this.gameOver){
+            this.scene.start("EcranAccueil");
+        }
+
+        if (this.cursors.space.isDown && this.teteDisponible==true){ //si la touche gauche est appuyée
+            this.tete=true; //et animation => gauche
+        }
+
+        if (this.cursors.left.isDown){ 
+            if (this.tete==true){
+                this.player.setVelocityX(-240); //alors vitesse négative en X
+                this.player.anims.play('teteleft', true);
+            }else{
+                        //si la touche gauche est appuyée
+            this.player.setVelocityX(-240); //alors vitesse négative en X
+            this.player.anims.play('left', true); //et animation => gauche
+            this.player.direction = 'left';
+            }
+
+        }else if (this.cursors.right.isDown){
+            if (this.tete==true){
+                this.player.setVelocityX(240); //alors vitesse négative en X
+                this.player.anims.play('teteright', true);
+            } else{
+                this.player.setVelocityX(240); //alors vitesse positive en X
+                this.player.anims.play('right', true); //et animation => droite
+                this.player.direction = 'right';
+                }
+        }else if (this.cursors.up.isDown){
+            if (this.tete==true){
+                this.player.setVelocityY(-240); //alors vitesse négative en X
+                this.player.anims.play('teteup', true);
+            }else{
+                this.player.setVelocityY(-240);
+                this.player.anims.play('up', true);
+                this.player.direction = 'up';
+                }
+        }else if (this.cursors.down.isDown){
+                if (this.tete==true){
+                    this.player.setVelocityY(240); //alors vitesse négative en X
+                    this.player.anims.play('tetedown', true);
+                }else{
+                this.player.setVelocityY(240);
+                this.player.anims.play('down', true);
+                this.player.direction = 'down';
+                }
+            }else{ // sinon
+                if (this.tete==true){
+                    this.player.setVelocityX(0);
+                    this.player.setVelocityY(0);
+                    this.player.anims.play('teteturn');
+                }else{
+                    this.player.setVelocityX(0);
+                    this.player.setVelocityY(0); //vitesse nulle
+                    this.player.anims.play('turn', true); //animation fait face caméra
+                }}
+            if ( Phaser.Input.Keyboard.JustDown(this.keys.d) && this.dash==true){
+                if (this.player.direction == 'left') { 
+                    this.player.x=this.player.x-50;
+                }
+                //this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
+                if (this.player.direction == 'right' && this.physics.add.overlap(this.player,this.obstacles)!=false) {
+                    this.player.x=this.player.x+50;
+                }
+                if (this.player.direction == 'up') {
+                    //this.player.y=this.player.y-50;
+                    this.player.setVelocityY(-5000);
+                    
+                }
+                if (this.player.direction == 'down') { 
+                    this.player.y=this.player.y+50;
+                }
+            }
+                if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false) {
+            this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
+            tirer(this.player,this.proj);
+            } 
+            }
+        };
 
         class EcranAccueil extends Phaser.Scene{
             constructor(){
                 super("EcranAccueil");
                 this.ecranAccueil;
                 this.boutonPlay;
+
+                this.vieJoueur=6;
+                this.teteDisponible=false;
+                this.coeur=false;
+                this.afficheScore;
+                this.objetInventaire=[];
+                this.dash=false;
+                this.nbElementInventaire=0;
             }
             preload(){
                 this.load.image('boutonplay','assets/boutonPlay.png');
@@ -41,20 +447,21 @@
             update(){
                 //Phaser.Input.Keyboard
                 //this.keys.a.isDown
-
+                //this.scene.start('game', { xp: 1 })
+//init(data){ this.experience = data.xp; }
                 if ( this.keys.a.isDown){
-                    this.scene.start("Tuto");
+                    this.scene.start('Tuto',{vieJoueur:6, teteDisponible: true, dash:false, afficheScore:0,inventaireAile:false,inventaireCle:false});
                 }
             }
         }
             //this.cursors.space.isDown
 
-        class Tuto extends Phaser.Scene{
+        class Plaine extends Phaser.Scene{
             constructor(){
-                super("Tuto");
+                super("Plaine");
                 this.vieJoueur=6;
                 this.invincible=false;
-                this.compteur = 90;
+                this.compteurInva = 60;
                 this.tete=false;
                 this.compteurTete=0;
                 this.teteDisponible=false;
@@ -66,6 +473,14 @@
                 this.objetInventaire=[];
                 this.dash=false;
                 this.nbElementInventaire=0;
+        }
+        init(data){
+            this.vieJoueur = data.vieJoueur;
+            this.dash = data.dash;
+            this.afficheScore = data.afficheScore;
+            this.teteDisponible = data.teteDisponible;
+            this.inventaireCle=data.inventaireCle;
+            this.inventaireAile=data.inventaireAile;
         }
         preload(){
             this.load.image('coffre', 'assets/coffre.png');
@@ -89,6 +504,8 @@
             this.load.spritesheet('barreVie','assets/barreVie.png',
             { frameWidth: 80, frameHeight: 32 });
             this.load.spritesheet('tete','assets/tete_hero_deplacement.png',
+            { frameWidth: 16, frameHeight: 16 });
+            this.load.spritesheet('attackPerso','assets/perso_attack.png',
             { frameWidth: 16, frameHeight: 16 });
 
 
@@ -121,40 +538,49 @@
                 this.player.setCollideWorldBounds(true);
                 this.physics.add.collider(this.player, this.obstacles);
 
-                this.physics.world.setBounds(0, 0, 1280, 1280);
-                this.cameras.main.setBounds(0, 0, 1280, 1280);
+                this.physics.world.setBounds(0, 0, 1280, 1000);
+                this.cameras.main.setBounds(0, 0,1280, 1000);
                 this.cameras.main.startFollow(this.player); 
 
                 this.anims.create({
-                key: 'left',
-                frames: this.anims.generateFrameNumbers('persoGolem', {start:14,end:20}),
-                frameRate: 10,
-                repeat: -1
+                    key: 'left',
+                    frames: this.anims.generateFrameNumbers('persoGolem', {start:14,end:20}),
+                    frameRate: 10,
+                    repeat: -1
                 });
                 this.anims.create({
-                key: 'turn',
-                frames: this.anims.generateFrameNumbers('persoGolem', {start:28,end:34}),
-                frameRate: 10,
-                repeat: -1
+                    key: 'turn',
+                    frames: this.anims.generateFrameNumbers('persoGolem', {start:28,end:34}),
+                    frameRate: 10,
+                    repeat: -1
                 });
                 this.anims.create({
-                key: 'right',
-                frames: this.anims.generateFrameNumbers('persoGolem', {start:21,end:27}),
-                frameRate: 10,
-                repeat: -1
+                    key: 'right',
+                    frames: this.anims.generateFrameNumbers('persoGolem', {start:21,end:27}),
+                    frameRate: 10,
+                    repeat: -1
                 });
                 this.anims.create({
-                key: 'up',
-                frames: this.anims.generateFrameNumbers('persoGolem', {start:7,end:13}),
-                frameRate: 10,
-                repeat: -1
+                    key: 'up',
+                    frames: this.anims.generateFrameNumbers('persoGolem', {start:7,end:13}),
+                    frameRate: 10,
+                    repeat: -1
                 });
                 this.anims.create({
-                key: 'down',
-                frames: this.anims.generateFrameNumbers('persoGolem', {start:0,end:6}),
-                frameRate: 10,
-                repeat: -1
+                    key: 'down',
+                    frames: this.anims.generateFrameNumbers('persoGolem', {start:0,end:6}),
+                    frameRate: 10,
+                    repeat: -1
                 });
+
+                this.anims.create({
+                    key: 'attackdown',
+                    frames: this.anims.generateFrameNumbers('attackPerso', {start:8,end:11}),
+                    frameRate: 5,
+                    repeat: -1
+                });
+
+
                 this.cursors = this.input.keyboard.createCursorKeys();
                 this.keys = this.input.keyboard.addKeys({
                     a:  Phaser.Input.Keyboard.KeyCodes.A,
@@ -249,8 +675,7 @@
 
             this.argent = this.physics.add.sprite(40, 107, 'argent').setScale(2);
             this.argent.setScrollFactor(0);
-            this.afficheScore=0;
-            this.scoreArgent=this.add.text(50,100,': 0',{fontSize:'16px',fill:'#000'});
+            this.scoreArgent=this.add.text(50,100,':'+this.afficheScore,{fontSize:'16px',fill:'#000'});
             this.scoreArgent.setScrollFactor(0);
 
             this.carcasse = this.physics.add.staticGroup();
@@ -262,51 +687,6 @@
 
             this.loot = this.physics.add.staticGroup();
             this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
-        }
-
-        update(){
-            //if (this.projectile.origineX-this.projectile.x){
-              //cleanProj();
-            //}
-
-            if (this.nouveauJoueur==true){
-                this.nouveauJoueur=false;
-                this.player.destroy();
-
-                this.player = this.physics.add.sprite(this.player.x, this.player.y, 'persoGolem').setScale(2);
-                this.player.setCollideWorldBounds(true);
-                this.player.direction = 'right';
-                this.physics.add.collider( this.player,  this.platforms);
-
-                this.physics.world.setBounds(0, 0, 1000, 1000);
-                this.cameras.main.setBounds(0, 0, 1000, 1000);
-                this.cameras.main.startFollow(this.player); 
-
-                this.physics.add.collider(this.player, this.obstacles);
-                this.physics.add.collider(this.player, this.coffre);
-                this.physics.add.overlap(this.player, this.coffre, ouvrirCoffre, null, this);
-                this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
-                this.physics.add.collider(this.player, this.power, powerActivate, null, this);
-                this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
-                this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
-        }
-
-        if (this.tete==true && this.compteurTete==0){
-            this.compteurTete=1;
-            this.carcasse.create(this.player.x, this.player.y, 'carcasse_hero').setScale(2);
-            this.player.destroy();
-            this.player = this.physics.add.sprite(this.player.x,this.player.y, 'tete').setScale(2);
-            this.player.setCollideWorldBounds(true);
-            this.physics.add.collider( this.player,  this.platforms);
-            this.physics.world.setBounds(0, 0, 1000, 1000);
-            this.cameras.main.setBounds(0, 0, 1000, 1000);
-            this.cameras.main.startFollow(this.player);
-            this.physics.add.collider(this.player, this.obstacles);
-            this.physics.add.collider(this.player, this.coffre);
-            this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
-            this.physics.add.collider(this.player, this.power, powerActivate, null, this);
-            this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
-            this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
 
             this.anims.create({
                 key: 'teteup',
@@ -340,11 +720,63 @@
             });
         }
 
+        update(){
+            if (this.inventaireCle==true){
+                this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireCle').setScale(2).setDepth(0);
+                this.imgInventaire.setScrollFactor(0);
+                this.nbElementInventaire=this.nbElementInventaire+1;
+            }
+            if (this.inventaireAile==true){
+                this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireAile').setScale(2).setDepth(0);
+                this.imgInventaire.setScrollFactor(0);
+                this.nbElementInventaire=this.nbElementInventaire+1;
+            }
+
+            if (this.nouveauJoueur==true){
+                this.nouveauJoueur=false;
+                this.player.destroy();
+
+                this.player = this.physics.add.sprite(this.player.x, this.player.y, 'persoGolem').setScale(2);
+                this.player.setCollideWorldBounds(true);
+                this.player.direction = 'right';
+                this.physics.add.collider( this.player,  this.platforms);
+
+                this.physics.world.setBounds(0, 0, 1280, 1000);
+                this.cameras.main.setBounds(0, 0, 1280, 1000);
+                this.cameras.main.startFollow(this.player); 
+
+                this.physics.add.collider(this.player, this.obstacles);
+                this.physics.add.collider(this.player, this.coffre);
+                this.physics.add.overlap(this.player, this.coffre, ouvrirCoffre, null, this);
+                this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
+                this.physics.add.collider(this.player, this.power, powerActivate, null, this);
+                this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
+                this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+        }
+
+        if (this.tete==true && this.compteurTete==0){
+            this.compteurTete=1;
+            this.carcasse.create(this.player.x, this.player.y, 'carcasse_hero').setScale(2);
+            this.player.destroy();
+            this.player = this.physics.add.sprite(this.player.x,this.player.y, 'tete').setScale(2);
+            this.player.setCollideWorldBounds(true);
+            this.physics.add.collider( this.player,  this.platforms);
+            this.physics.world.setBounds(0, 0, 1280, 1000);
+            this.cameras.main.setBounds(0, 0, 1280, 1000);
+            this.cameras.main.startFollow(this.player);
+            this.physics.add.collider(this.player, this.obstacles);
+            this.physics.add.collider(this.player, this.coffre);
+            this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
+            this.physics.add.collider(this.player, this.power, powerActivate, null, this);
+            this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
+            this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+        }
+
         if(this.invincible == true){
-            this.compteur-- ;
+            this.compteurInva-- ;
             this.player.setTint(0xff0000);
-             if(this.compteur == 0){
-                this.compteur = 90;
+             if(this.compteurInva == 0){
+                this.compteurInva = 60;
                 this.player.setTint(0xffffff);
                 this.invincible = false ;
             }
@@ -370,18 +802,12 @@
         }
         if (this.vieJoueur==0){
             this.barreVie.anims.play('barreVie0', true); //et animation => gauche
+            this.gameOver=true;
         }
 
-   // if (this.compteurTete==1 && (this.player.x+32>this.carcasse.x && this.player.y<this.carcasse.y+64) )
-
-        if (this.gameOver){return;}
-
-        if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false) {
-        //if (this.keys.d.isDown){
-            //this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
-            this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
-            tirer(this.player,this.proj);
-            }
+        if (this.gameOver){
+            this.scene.start("EcranAccueil");
+        }
 
         if (this.cursors.space.isDown && this.teteDisponible==true){ //si la touche gauche est appuyée
             this.tete=true; //et animation => gauche
@@ -451,6 +877,10 @@
                 if (this.player.direction == 'down') { 
                     this.player.y=this.player.y+50;
                 }
+            }
+                if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false) {
+            this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
+            tirer(this.player,this.proj);
             } 
             }
         };
@@ -480,21 +910,23 @@
                 this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireCle').setScale(2).setDepth(0);
                 this.imgInventaire.setScrollFactor(0);
                 this.nbElementInventaire=this.nbElementInventaire+1;
+                this.inventaireCle=true;
             }
             if (loot.nom=="aile"){
                 this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireAile').setScale(2).setDepth(0);
                 this.imgInventaire.setScrollFactor(0);
                 this.nbElementInventaire=this.nbElementInventaire+1;
+                this.inventaireAile=true;
             }
             //this.objetInventaire.push(loot);
             //updateInventaire();
         }
 
-        function updateInventaire(){
+        /*function updateInventaire(){
             for (let i = 0; i < this.objetInventaire.length; i++) {
                 console.log(item, index);
             }
-        }
+        }*/
 
         function cleanProj(projectileP,obstacles){
             projectileP.destroy();
@@ -523,6 +955,18 @@
             }
         }
 
+        function passage(player,power){
+        if ( this.keys.e.isDown){
+            this.scene.start('Plaine',{
+                vieJoueur:this.vieJoueur,
+                teteDisponible: this.teteDisponible, 
+                dash:this.dash, 
+                afficheScore:this.afficheScore,
+                inventaireCle:this.inventaireCle,
+                inventaireAile:this.inventaireAile
+        });
+            }
+        }
         function retourCorps(player,carcasse){
             if (this.keys.e.isDown){
                 this.compteurTete=0;
@@ -556,7 +1000,7 @@
                 debug: true
             }},
 
-            scene: [EcranAccueil,Tuto,PlayGame]
+            scene: [EcranAccueil,Plaine,Tuto]
             };
             new Phaser.Game(config);
 
