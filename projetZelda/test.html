@@ -370,15 +370,11 @@
                 }
 
 
-                if (this.cursors.left.isDown){ 
-                    if (this.tete==true){
-                        this.player.setVelocityX(-240); //alors vitesse négative en X
-                        this.player.anims.play('teteleft', true);
-                    }else{
+                if (this.cursors.left.isDown && toucheAppuyer==false){ 
                         //si la touche gauche est appuyée
                     this.player.setVelocityX(-240); //alors vitesse négative en X
-                    this.player.anims.play('left', true); //et animation => gauche
-                    }
+                    this.player.anims.play('left', true); //et animation => gauch
+                    this.toucheAppuyer=true;
                 }
                 else if (this.cursors.right.isDown){
                     if (this.tete==true){

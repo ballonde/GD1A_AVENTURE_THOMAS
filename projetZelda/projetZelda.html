@@ -30,8 +30,12 @@ class Donjon2 extends Phaser.Scene{
                 this.nbCle=0;
                 this.nbAileMax=1;
                 this.dashVal=0;
-                this.texteIntAff=false;
-                this.texteTirAff=false;
+                this.texteTeteAff=false;
+                this.porte1=false;
+                this.partie1porte2=false;
+                this.partie2porte2=false;
+                this.partie1coffre=false;
+                this.partie2coffre=false;
         }
         init(data){
             this.vieJoueur = data.vieJoueur;
@@ -51,6 +55,10 @@ class Donjon2 extends Phaser.Scene{
             this.load.image('power_up', 'assets/power_up.png');
             this.load.image('carcasse_hero', 'assets/carcasse_hero.png');
             this.load.image('cle', 'assets/cle.png');
+            this.load.image('plaque', 'assets/plaque_pression.png');
+            this.load.image('murPorte', 'assets/murPorte.png');
+            this.load.image('murPorteVerticale', 'assets/murPorteVertical.png');
+            this.load.image('texteTete', 'assets/texteTete.png');
 
 
             this.load.spritesheet('sentinelleMouv', 'assets/mob_spritesheet_deplacement.png',
@@ -90,7 +98,11 @@ class Donjon2 extends Phaser.Scene{
                 this.obstacles = this.carteDonjon2.createStaticLayer(
                     "Calque 2",
                     this.tileset
-                    ); 
+                    );
+                this.props = this.carteDonjon2.createStaticLayer(
+                    "Calque 3",
+                    this.tileset
+                ); 
 
                 this.plateformes.setScale(2);
                 this.obstacles.setScale(2);
@@ -98,14 +110,14 @@ class Donjon2 extends Phaser.Scene{
 
                 this.obstacles.setCollisionByProperty({ estSolide: true});
 
-                this.player = this.physics.add.sprite(100, 450, 'persoGolem').setScale(2);
+                this.player = this.physics.add.sprite(1152, 192, 'persoGolem').setScale(2);
                 this.player.direction = 'right';  
                 this.player.setCollideWorldBounds(true);
                 this.physics.add.collider(this.player, this.obstacles);
                 //this.physics.add.collider(this.player, this.power, powerActivate, null, this);
 
-                this.physics.world.setBounds(0, 0, 1280, 1000);
-                this.cameras.main.setBounds(0, 0,1280, 1000);
+                this.physics.world.setBounds(0, 0, 2432, 2624);
+                this.cameras.main.setBounds(0, 0, 2432, 2624);
                 this.cameras.main.startFollow(this.player); 
 
                 this.anims.create({
@@ -231,66 +243,11 @@ class Donjon2 extends Phaser.Scene{
                 frameRate: 20
             });
 
-            this.slimes = this.physics.add.group();
-            this.slime = this.physics.add.sprite(500,300, 'slime').setScale(2);
-            this.slimes.add(this.slime);
-            this.slime.vie=100;
-            this.slime.direction='null';
-            this.anims.create({
-                key: 'slimeRight',
-                frames: this.anims.generateFrameNumbers('slime', {start:0,end:4}),
-                frameRate: 20,
-                repeat: -1
-            });
-            this.anims.create({
-                key: 'slimeUp',
-                frames: this.anims.generateFrameNumbers('slime', {start:27,end:35}),
-                frameRate: 20,
-                repeat: -1
-            });
-            this.anims.create({
-                key: 'slimeLeft',
-                frames: this.anims.generateFrameNumbers('slime', {start:9,end:13}),
-                frameRate: 20,
-                repeat: -1
-            });
-            this.anims.create({
-                key: 'slimeDown',
-                frames: this.anims.generateFrameNumbers('slime', {start:18,end:26}),
-                frameRate: 20,
-                repeat: -1
-            });
-           this.anims.create({
-                key: 'slimeTurnLeft',
-                frames: [ { key: 'slime', frame: 37 } ],
-                frameRate: 20
-            });
-            this.anims.create({
-                key: 'slimeTurnRight',
-                frames: [ { key: 'slime', frame: 36 } ],
-                frameRate: 20
-            });
-            this.anims.create({
-                key: 'slimeTurnDown',
-                frames: [ { key: 'slime', frame: 38 } ],
-                frameRate: 20
-            });
-            this.anims.create({
-                key: 'slimeTurnUp',
-                frames: [ { key: 'slime', frame: 39 } ],
-                frameRate: 20
-            });
-
-
-
             this.power = this.physics.add.staticGroup();
-            this.power.create(600, 500, 'power_up').setScale(2);
-            this.physics.add.overlap(this.player, this.power, tutoPower, null, this);
+            this.power.create(1200, 300, 'power_up').setScale(2);
+            this.physics.add.overlap(this.player, this.power, powerTete, null, this);
 
             this.coffre = this.physics.add.staticGroup();
-            this.coffre.create(400, 500, 'coffre').setScale(2);
-            this.physics.add.overlap(this.player, this.coffre, ouvrirCoffre, null, this);
-            this.physics.add.collider(this.player, this.coffre);
 
             this.argent = this.physics.add.sprite(40, 107, 'argent').setScale(2);
             this.argent.setScrollFactor(0);
@@ -298,7 +255,26 @@ class Donjon2 extends Phaser.Scene{
             this.scoreArgent.setScrollFactor(0);
 
             this.carcasse = this.physics.add.staticGroup();
-            this.carcasse.create(400, 100, 'carcasse_hero').setScale(2);
+            this.carcasse.create(384, 384, 'carcasse_hero').setScale(2);
+            this.carcasse.create(1472, 1572, 'carcasse_hero').setScale(2);
+            this.carcasse.create(2054, 1246, 'carcasse_hero').setScale(2);
+            this.carcasse.create(1408, 2334, 'carcasse_hero').setScale(2);
+            this.carcasse.create(1600, 1886, 'carcasse_hero').setScale(2);
+
+
+            this.plaques = this.physics.add.staticGroup();
+            this.plaques.create(104, 552, 'plaque').setScale(2);
+            this.plaques.create(1192, 1306, 'plaque').setScale(2);
+            this.plaques.create(2304, 1306, 'plaque').setScale(2);
+            this.plaques.create(2048, 2556, 'plaque').setScale(2);
+            this.plaques.create(2048, 1894, 'plaque').setScale(2);
+
+            this.physics.add.overlap(this.plaques, this.carcasse, activePlaque, null, this);
+
+            this.portes= this.physics.add.staticGroup();
+            this.porte1=this.portes.create(1440, 430, 'murPorteVerticale').setScale(2).refreshBody();
+            this.porte2=this.portes.create(1730, 1825, 'murPorte').setScale(2).refreshBody();
+            this.physics.add.collider(this.player, this.portes);
 
             this.projectileP = this.physics.add.group();
             this.physics.add.collider(this.projectileP, this.obstacles, cleanProj, null, this);
@@ -382,23 +358,6 @@ if (this.dashVal<0){this.dashVal = 0};
                 this.nbCle=this.nbCle+1;
             }
 
-            if (this.slime.x>this.player.x){
-                this.slime.setVelocityX(-30); //alors vitesse négative en X
-                this.slime.anims.play('slimeLeft', true);
-            }
-            if (this.slime.x<this.player.x){
-                this.slime.setVelocityX(30); //alors vitesse négative en X
-                this.slime.anims.play('slimeRight', true);
-            }/*
-            if (this.slime.y>this.player.y){
-                this.slime.setVelocityY(-150); //alors vitesse négative en X
-                this.slime.anims.play('slimeUp', true);
-            }
-            if (this.slime.y<this.player.y){
-                this.slime.setVelocityY(150); //alors vitesse négative en X
-                this.slime.anims.play('slimeDown', true);
-            }*/
-
             if (this.nouveauJoueur==true){
                 this.nouveauJoueur=false;
                 this.player.destroy();
@@ -408,12 +367,13 @@ if (this.dashVal<0){this.dashVal = 0};
                 this.player.direction = 'right';
                 this.physics.add.collider( this.player,  this.platforms);
 
-                this.physics.world.setBounds(0, 0, 1280, 1000);
-                this.cameras.main.setBounds(0, 0, 1280, 1000);
+                this.physics.world.setBounds(0, 0, 2432, 2624);
+                this.cameras.main.setBounds(0, 0, 2432, 2624);
                 this.cameras.main.startFollow(this.player); 
 
                 this.physics.add.collider(this.player, this.obstacles);
                 this.physics.add.collider(this.player, this.coffre);
+                this.physics.add.collider(this.player, this.portes);
                 this.physics.add.overlap(this.player, this.coffre, ouvrirCoffre, null, this);
                 this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
                 this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
@@ -427,11 +387,13 @@ if (this.dashVal<0){this.dashVal = 0};
             this.player = this.physics.add.sprite(this.player.x,this.player.y, 'tete').setScale(2);
             this.player.setCollideWorldBounds(true);
             this.physics.add.collider( this.player,  this.platforms);
-            this.physics.world.setBounds(0, 0, 1280, 1000);
-            this.cameras.main.setBounds(0, 0, 1280, 1000);
+            this.physics.world.setBounds(0, 0, 2432, 2624);
+            this.cameras.main.setBounds(0, 0, 2432, 2624);
+            this.cameras.main.startFollow(this.player);
             this.cameras.main.startFollow(this.player);
             this.physics.add.collider(this.player, this.obstacles);
             this.physics.add.collider(this.player, this.coffre);
+            this.physics.add.collider(this.player, this.portes);
             this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
             this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
             this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
@@ -537,8 +499,7 @@ if (this.dashVal<0){this.dashVal = 0};
                 }
             }
 
-            if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false && this.tirDE==true) {
-                this.console.log(this.tir);
+            if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false && this.tir==true) {
                 this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
                 tirer(this.player,this.proj);
             } 
@@ -1386,8 +1347,6 @@ if (this.dashVal<0){this.dashVal = 0};
                 frameRate: 10,
                 repeat: -1
             });
-
-            updateAffichageInventaire(this.player);
         }
 
 
@@ -1616,6 +1575,31 @@ if (this.dashVal<0){this.dashVal = 0};
             projectileP.destroy();
         }
 
+        function activePlaque(plaques,carcasse){
+            if (plaques.x==104 && plaques.y==552){
+                this.porte1.destroy();
+            }
+            if (plaques.x==1192 && plaques.y==1306){
+                this.partie1porte2=true;
+            }
+            if (plaques.x==2304 && plaques.y==1306){
+                this.partie2porte2=true;
+            }
+            if( this.partie1porte2==true && this.partie2porte2==true){
+                this.porte2.destroy();
+            }
+            if (plaques.x==2048 && plaques.y==2556){
+                this.partie2coffre=true;
+            }
+            if (plaques.x==2048 && plaques.y==1894){
+                this.partie1coffre=true;
+            }
+            if( this.partie1coffre==true && this.partie2coffre==true){
+                this.coffre.create(400, 500, 'coffre').setScale(2);
+                this.physics.add.overlap(this.player, this.coffre, ouvrirCoffre, null, this);
+                this.physics.add.collider(this.player, this.coffre);
+            }
+        }
         function degatMonstre(projectileP,sentinelle){
             projectileP.destroy();
             sentinelle.vie=sentinelle.vie-10;
@@ -1641,7 +1625,7 @@ if (this.dashVal<0){this.dashVal = 0};
 
         function passage(player,power){
         if ( this.keys.e.isDown){
-            this.scene.start('Plaine',{
+            this.scene.start('Donjon2',{
                 vieJoueur:this.vieJoueur,
                 teteDisponible: this.teteDisponible, 
                 dash:this.dash, 
@@ -1662,10 +1646,18 @@ if (this.dashVal<0){this.dashVal = 0};
             }
         }
 
-        function powerActivate(player,power){
+        function powerDash(player,power){
             this.dash=true;
+            power.disableBody(true, true);
+        }
+
+        function powerTete(player,power){
+            if (this.keys.e.isDown){
             this.teteDisponible=true;
             power.disableBody(true, true);
+            this.affichagetete=this.texteTuto.create(600, 500, 'texteTete').setScale(4);
+            this.texteTeteAff=true;
+            }
         }
 
         function tutoPower(player,power){
