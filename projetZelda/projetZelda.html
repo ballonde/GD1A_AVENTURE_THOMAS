@@ -35,6 +35,8 @@
                 this.partie1coffre=true;
                 this.partie2coffre=true;
                 this.coffre1=false;
+                this.texteDashAff=false;
+                this.nbtexteAffichage=0;
         }
         init(data){
             this.vieJoueur = data.vieJoueur;
@@ -76,8 +78,8 @@
             { frameWidth: 16, frameHeight: 16 });
             this.load.spritesheet('attackPerso','assets/perso_attack.png',
             { frameWidth: 48, frameHeight: 32 });
-            this.load.spritesheet('slime','assets/spriteSheet_Slime.png',
-            { frameWidth: 32, frameHeight: 16 });
+            this.load.spritesheet('texteTutoSprite','assets/texteTutoSprite.png',
+            { frameWidth: 96, frameHeight: 80 });
 
 
             this.load.image('donjon_asset', 'assets/donjon.png');
@@ -303,15 +305,25 @@
                 repeat: -1
             });
             this.texteTuto = this.physics.add.staticGroup();
+
+            this.anims.create({
+                    key: 'texteDash',
+                    frames: [ { key: 'texteTutoSprite', frame: 0 } ],
+                    frameRate: 20
+                });
         }
 
 
         update(){
-            if (this.keys.e.isDown){
-                if (this.texteTirAff==true || this.texteIntAff==true){
-                this.texteInteraction.destroy();
-                this.texteTir.destroy();
-                }
+            if ( this.texteDashAff==true && this.nbtexteAffichage==0){
+                this.texteTutoAffichage = this.physics.add.sprite(this.barreVie.x+500,this.barreVie.y+350, 'texteTutoSprite').setScale(4).refreshBody();
+                this.texteTutoAffichage.setScrollFactor(0);
+                this.texteTutoAffichage.anims.play('texteDash', true); //et animation => gauche
+                this.nbtexteAffichage=1;
+            }
+            if (this.keys.d.isDown && this.texteDashAff==true){ 
+                this.texteTutoAffichage.destroy();
+                this.texteDashAff==false;
             }
 
             if ((this.input.keyboard.checkDown(this.keys.d,9000)==true)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000};
@@ -498,17 +510,18 @@ if (this.dashVal<0){this.dashVal = 0};
         }};
 
 /////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
 class Donjon2 extends Phaser.Scene{
             constructor(){
                 super("Donjon2");
@@ -534,9 +547,11 @@ class Donjon2 extends Phaser.Scene{
                 this.porte1=false;
                 this.partie1porte2=false;
                 this.partie2porte2=false;
-                this.partie1coffre=true;
-                this.partie2coffre=true;
+                this.partie1coffre=false;
+                this.partie2coffre=false;
                 this.coffre1=false;
+                this.texteTeteAff=false;
+                this.nbtexteAffichage=0;
         }
         init(data){
             this.vieJoueur = data.vieJoueur;
@@ -581,6 +596,8 @@ class Donjon2 extends Phaser.Scene{
             { frameWidth: 48, frameHeight: 32 });
             this.load.spritesheet('slime','assets/spriteSheet_Slime.png',
             { frameWidth: 32, frameHeight: 16 });
+            this.load.spritesheet('texteTutoSprite','assets/texteTutoSprite.png',
+            { frameWidth: 96, frameHeight: 80 });
 
 
             this.load.image('donjon_asset', 'assets/donjon.png');
@@ -615,7 +632,7 @@ class Donjon2 extends Phaser.Scene{
                 this.player = this.physics.add.sprite(this.coordPlayerX, this.coordPlayerY, 'persoGolem').setScale(2);
                 this.player.direction = 'right';  
                 this.player.setCollideWorldBounds(true);
-                this.physics.add.collider(this.player, this.obstacles);
+                //this.physics.add.collider(this.player, this.obstacles);
                 this.physics.add.overlap(this.player, this.escalier, passagePlaineD2, null, this);
 
                 this.physics.world.setBounds(0, 0, 2432, 2624);
@@ -707,14 +724,34 @@ class Donjon2 extends Phaser.Scene{
                     frameRate: 20
                 });
 
-            this.sentinelles = this.physics.add.group();
-            this.sentinelle = this.physics.add.sprite(300,300, 'sentinelleMouv').setScale(2);
+                this.sentinelles = this.physics.add.group();
+            this.sentinelle = this.physics.add.sprite(128,100, 'sentinelleMouv').setScale(2);
             this.sentinelles.add(this.sentinelle);
-            this.sentinelle.vie=40;
             this.sentinelle.setPushable(false);
-            console.log(this.sentinelle);
-            this.sentinelle.direction='null';
+            this.sentinelle.vie=40;
+            this.sentinelle.direction='right';
+            this.sentinelle = this.physics.add.sprite(1200,1200, 'sentinelleMouv').setScale(2);
+            this.sentinelles.add(this.sentinelle);
+            this.sentinelle.setPushable(false);
+            this.sentinelle.vie=40;
+            this.sentinelle.direction='up';
+            this.sentinelle = this.physics.add.sprite(2112,1438, 'sentinelleMouv').setScale(2);
+            this.sentinelles.add(this.sentinelle);
+            this.sentinelle.setPushable(false);
+            this.sentinelle.vie=40;
+            this.sentinelle.direction='left';
+            this.sentinelle = this.physics.add.sprite(1600,2496, 'sentinelleMouv').setScale(2);
+            this.sentinelles.add(this.sentinelle);
+            this.sentinelle.setPushable(false);
+            this.sentinelle.vie=40;
+            this.sentinelle.direction='right';
+            this.sentinelle = this.physics.add.sprite(1792,2112, 'sentinelleMouv').setScale(2);
+            this.sentinelles.add(this.sentinelle);
+            this.sentinelle.setPushable(false);
+            this.sentinelle.vie=40;
+            this.sentinelle.direction='down';
             this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+            this.physics.add.collider(this.sentinelles, this.obstacles,changeOrSenti, null,this);
             this.anims.create({
                 key: 'sentinelleUp',
                 frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:12,end:15}),
@@ -724,25 +761,26 @@ class Donjon2 extends Phaser.Scene{
             this.anims.create({
                 key: 'sentinelleDown',
                 frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:8,end:11}),
-                frameRate: 10,
+                frameRate: 5,
                 repeat: -1
             });
             this.anims.create({
                 key: 'sentinelleLeft',
                 frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:4,end:7}),
-                frameRate: 10,
+                frameRate: 5,
                 repeat: -1
             });
             this.anims.create({
                 key: 'sentinelleRight',
                 frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:0,end:3}),
-                frameRate: 10,
+                frameRate: 5,
                 repeat: -1
             });
-           this.anims.create({
+            this.anims.create({
                 key: 'sentinelleIdle',
-                frames: [ { key: 'sentinelleMouv', frame: 8 } ],
-                frameRate: 20
+                frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:16,end:19}),
+                frameRate: 5,
+                repeat: -1
             });
 
             this.power = this.physics.add.staticGroup();
@@ -758,8 +796,8 @@ class Donjon2 extends Phaser.Scene{
             this.scoreArgent.setScrollFactor(0);
 
             this.carcasse = this.physics.add.staticGroup();
-            this.carcasse.create(384, 384, 'carcasse_hero').setScale(2);
-            this.carcasse.create(1472, 1572, 'carcasse_hero').setScale(2);
+            this.carcasse.create(384, 334, 'carcasse_hero').setScale(2);
+            this.carcasse.create(1472, 1505, 'carcasse_hero').setScale(2);
             this.carcasse.create(2054, 1246, 'carcasse_hero').setScale(2);
             this.carcasse.create(1408, 2334, 'carcasse_hero').setScale(2);
             this.carcasse.create(1600, 1886, 'carcasse_hero').setScale(2);
@@ -817,15 +855,51 @@ class Donjon2 extends Phaser.Scene{
                 repeat: -1
             });
             this.texteTuto = this.physics.add.staticGroup();
+
+
+                this.anims.create({
+                    key: 'texteTete',
+                    frames: [ { key: 'texteTutoSprite', frame: 3 } ],
+                    frameRate: 20
+                });
         }
 
 
         update(){
-            if (this.keys.e.isDown){
-                if (this.texteTirAff==true || this.texteIntAff==true){
-                this.texteInteraction.destroy();
-                this.texteTir.destroy();
-                }
+
+            this.sentinelles.children.iterate(function (child) {
+                
+                if (child.direction=="right"){
+                   child.anims.play('sentinelleRight', true); //et animation => gauche
+                   child.setVelocityX(250);
+               }
+               else if(child.direction=="left"){
+                   child.anims.play('sentinelleLeft', true); //et animation => gauche
+                   child.setVelocityX(-250);
+               }
+               else if (child.direction=="up"){
+                   child.anims.play('sentinelleUp', true); //et animation => gauche
+                   child.setVelocityY(-250);
+               }
+               else if (child.direction=="down"){
+                   child.anims.play('sentinelleDown', true); //et animation => gauche
+                   child.setVelocityY(250);
+               }else{
+                   child.anims.play('sentinelleIdle', true); //et animation => gauche
+                   child.setVelocity(0,0);
+               }
+                   })
+
+
+            if ( this.texteTeteAff==true && this.nbtexteAffichage==0){
+                this.texteTutoAffichage = this.physics.add.sprite(this.player.x-600,this.player.y+100, 'texteTutoSprite').setScale(4).refreshBody();
+                this.texteTutoAffichage.setScrollFactor(0);
+                this.texteTutoAffichage.anims.play('texteTete', true); //et animation => gauche
+                this.nbtexteAffichage=1;
+            }
+            if (this.cursors.space.isDown && this.teteDisponible==true){ 
+                this.texteTutoAffichage.destroy();
+                this.texteTeteAff==false;
             }
 
             if ((this.input.keyboard.checkDown(this.keys.d,9000)==true)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000};
@@ -1048,6 +1122,7 @@ if (this.dashVal<0){this.dashVal = 0};
             this.texteTirAff=false;
             this.texteIntAff=false;
             this.dashVal=0;
+            this.nbtexteAffichage=0;
         }
         init(data){
             this.vieJoueur = data.vieJoueur;
@@ -1090,6 +1165,8 @@ if (this.dashVal<0){this.dashVal = 0};
             { frameWidth: 16, frameHeight: 16 });
             this.load.spritesheet('attackPerso','assets/perso_attack.png',
             { frameWidth: 16, frameHeight: 16 });
+            this.load.spritesheet('texteTutoSprite','assets/texteTutoSprite.png',
+            { frameWidth: 96, frameHeight: 80 });
 
             }
             create(){
@@ -1215,12 +1292,23 @@ if (this.dashVal<0){this.dashVal = 0};
                 });
 
             this.sentinelles = this.physics.add.group();
-            this.sentinelle = this.physics.add.sprite(300,300, 'sentinelleMouv').setScale(2);
+            this.sentinelle = this.physics.add.sprite(450,860, 'sentinelleMouv').setScale(2);
             this.sentinelles.add(this.sentinelle);
             this.sentinelle.setPushable(false);
             this.sentinelle.vie=40;
             this.sentinelle.direction='null';
+            this.sentinelle = this.physics.add.sprite(450,860, 'sentinelleMouv').setScale(2);
+            this.sentinelles.add(this.sentinelle);
+            this.sentinelle.setPushable(false);
+            this.sentinelle.vie=40;
+            this.sentinelle.direction='right';
+            this.sentinelle = this.physics.add.sprite(450,860, 'sentinelleMouv').setScale(2);
+            this.sentinelles.add(this.sentinelle);
+            this.sentinelle.setPushable(false);
+            this.sentinelle.vie=40;
+            this.sentinelle.direction='left';
             this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+            this.physics.add.collider(this.sentinelles, this.obstacles,changeOrSenti, null,this);
             this.anims.create({
                 key: 'sentinelleUp',
                 frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:12,end:15}),
@@ -1230,26 +1318,28 @@ if (this.dashVal<0){this.dashVal = 0};
             this.anims.create({
                 key: 'sentinelleDown',
                 frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:8,end:11}),
-                frameRate: 10,
+                frameRate: 5,
                 repeat: -1
             });
             this.anims.create({
                 key: 'sentinelleLeft',
                 frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:4,end:7}),
-                frameRate: 10,
+                frameRate: 5,
                 repeat: -1
             });
             this.anims.create({
                 key: 'sentinelleRight',
                 frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:0,end:3}),
-                frameRate: 10,
+                frameRate: 5,
                 repeat: -1
             });
-           this.anims.create({
+            this.anims.create({
                 key: 'sentinelleIdle',
-                frames: [ { key: 'sentinelleMouv', frame: 8 } ],
-                frameRate: 20
+                frames: this.anims.generateFrameNumbers('sentinelleMouv', {start:16,end:19}),
+                frameRate: 5,
+                repeat: -1
             });
+
             this.carcasse = this.physics.add.staticGroup();
             this.power = this.physics.add.staticGroup();
             this.power.create(450, 500, 'power_up').setScale(2);
@@ -1302,9 +1392,82 @@ if (this.dashVal<0){this.dashVal = 0};
                 frameRate: 10,
                 repeat: -1
             });
+            
+
+                this.anims.create({
+                    key: 'texteInteraction',
+                    frames: [ { key: 'texteTutoSprite', frame: 1 } ],
+                    frameRate: 20
+                });
+                this.anims.create({
+                    key: 'texteTir',
+                    frames: [ { key: 'texteTutoSprite', frame: 2 } ],
+                    frameRate: 20
+                });
+                
         }
 
         update(){
+/*
+            if (this.sentinelle.direction=="right"){
+                this.sentinelle.anims.play('sentinelleRight', true); //et animation => gauche
+            }
+            else if(this.sentinelle.direction=="left"){
+                this.sentinelle.anims.play('sentinelleLeft', true); //et animation => gauche
+            }
+            else if (this.sentinelle.direction=="up"){
+                this.sentinelle.anims.play('sentinelleUp', true); //et animation => gauche
+            }
+            else if (this.sentinelle.direction=="down"){
+                this.sentinelle.anims.play('sentinelleDown', true); //et animation => gauche
+            }else{
+                this.sentinelle.anims.play('sentinelleIdle', true); //et animation => gauche
+            }*/
+            //iaSentinelle();
+            this.sentinelles.children.iterate(function (child) {
+                
+                if (child.direction=="right"){
+                   child.anims.play('sentinelleRight', true); //et animation => gauche
+                   child.setVelocityX(250);
+               }
+               else if(child.direction=="left"){
+                   child.anims.play('sentinelleLeft', true); //et animation => gauche
+                   child.setVelocityX(-250);
+               }
+               else if (child.direction=="up"){
+                   child.anims.play('sentinelleUp', true); //et animation => gauche
+                   child.setVelocityY(-250);
+               }
+               else if (child.direction=="down"){
+                   child.anims.play('sentinelleDown', true); //et animation => gauche
+                   child.setVelocityY(250);
+               }else{
+                   child.anims.play('sentinelleIdle', true); //et animation => gauche
+                   child.setVelocity(0,0);
+               }
+                   })
+
+            if ( this.texteIntAff==true && this.nbtexteAffichage==0){
+                this.texteTutoAffichage = this.physics.add.sprite(100,100, 'texteTutoSprite').setScale(2);
+                this.texteTutoAffichage.setScrollFactor(0);
+                this.texteTutoAffichage.anims.play('texteInteraction', true); //et animation => gauche
+                this.nbtexteAffichage=1;
+            }
+            if (this.keys.e.isDown && this.texteIntAff==true){ 
+                this.texteTutoAffichage.destroy();
+                this.texteIntAff==false;
+            }
+            if ( this.texteTirAff==true && this.nbtexteAffichage==2){
+                this.texteTutoAffichage = this.physics.add.sprite(100,100, 'texteTutoSprite').setScale(2);
+                this.texteTutoAffichage.setScrollFactor(0);
+                this.texteTutoAffichage.anims.play('texteTir', true); //et animation => gauche
+            }
+            if (this.keys.a.isDown && this.texteTirAff==true){ 
+                this.texteTutoAffichage.destroy();
+                this.texteTirAff==false;
+                this.nbtexteAffichage=3;
+                this.texteTutoAffichage.destroy();
+            }
 
             if (this.inventaireAile==true && this.nbAile<this.nbAileMax){
                 this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireAile').setScale(2).setDepth(0);
@@ -1591,6 +1754,7 @@ if (this.dashVal==0){
             this.load.image('cle', 'assets/cle.png');
             this.load.image('portail', 'assets/portail.png');
             this.load.image('escalierPlaine', 'assets/escalierPlaine.png');
+            this.load.image('prix', 'assets/prixMarchant.png');
 
 
             this.load.spritesheet('argent', 'assets/argent.png',
@@ -1605,6 +1769,10 @@ if (this.dashVal==0){
             { frameWidth: 48, frameHeight: 32 });
             this.load.spritesheet('slime','assets/spriteSheet_Slime.png',
             { frameWidth: 32, frameHeight: 16 });
+            this.load.spritesheet('marchant','assets/marchantAnim.png',
+            { frameWidth: 160, frameHeight: 96 });
+            this.load.spritesheet('marchandise','assets/marchandise.png',
+            { frameWidth: 32, frameHeight: 32 });
 
 
             this.load.image('plaine_asset', 'assets/plaine_asset.png');
@@ -1786,6 +1954,51 @@ if (this.dashVal==0){
                 frames: [ { key: 'slime', frame: 39 } ],
                 frameRate: 20
             });
+
+            this.marchant=this.physics.add.sprite(950,350, 'marchant').setScale(2);
+            this.anims.create({
+                key: 'marchantIdle',
+                frames: this.anims.generateFrameNumbers('marchant', {start:0,end:3}),
+                frameRate: 5,
+                repeat: -1
+            });
+            this.marchant.anims.play('marchantIdle', true);
+            this.marchant.setPushable(false);
+            this.physics.add.collider(this.player, this.marchant);
+
+            this.marchandises = this.physics.add.group();
+            this.marchandise1=this.physics.add.sprite(850,500, 'marchandise').setScale(2);
+            this.marchandise2=this.physics.add.sprite(950,500, 'marchandise').setScale(2);
+            this.marchandise3=this.physics.add.sprite(1050,500, 'marchandise').setScale(2);
+            this.marchandises.add(this.marchandise1);
+            this.marchandises.add(this.marchandise2);
+            this.marchandises.add(this.marchandise3);
+
+            this.prix = this.physics.add.staticGroup();
+            this.prix.create(700, 450, 'prix').setScale(2);
+
+            this.anims.create({
+                key: 'marchandiseVertIdle',
+                frames: this.anims.generateFrameNumbers('marchandise', {start:0,end:3}),
+                frameRate: 5,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'marchandiseOrangeIdle',
+                frames: this.anims.generateFrameNumbers('marchandise', {start:4,end:7}),
+                frameRate: 5,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'marchandiseVioletIdle',
+                frames: this.anims.generateFrameNumbers('marchandise', {start:8,end:11}),
+                frameRate: 5,
+                repeat: -1
+            });
+        
+            this.marchandise1.anims.play('marchandiseVertIdle', true);
+            this.marchandise2.anims.play('marchandiseOrangeIdle', true);
+            this.marchandise3.anims.play('marchandiseVioletIdle', true);
 
             this.argent = this.physics.add.sprite(40, 107, 'argent').setScale(2);
             this.argent.setScrollFactor(0);
@@ -2049,6 +2262,45 @@ if (this.dashVal<0){this.dashVal = 0};
                 console.log(item, index);
             }
         }*/
+        function changeOrSenti(sentinelle){
+            if (sentinelle.direction=="right"){
+                sentinelle.direction="left";
+            }
+            else if(sentinelle.direction=="left"){
+                sentinelle.direction="right";
+            }
+            else if (sentinelle.direction=="up"){
+                sentinelle.direction="down";
+
+            }
+            else{
+                sentinelle.direction="up";
+            }
+        }
+        function iaSentinelle(){
+            this.sentinelles.children.iterate(function (child) {
+                
+             if (child.direction=="right"){
+                child.anims.play('sentinelleRight', true); //et animation => gauche
+                child.setVelocityX(250);
+            }
+            else if(child.direction=="left"){
+                child.anims.play('sentinelleLeft', true); //et animation => gauche
+                child.setVelocityX(-250);
+            }
+            else if (child.direction=="up"){
+                child.anims.play('sentinelleUp', true); //et animation => gauche
+                child.setVelocityY(-250);
+            }
+            else if (child.direction=="down"){
+                child.anims.play('sentinelleDown', true); //et animation => gauche
+                child.setVelocityY(250);
+            }else{
+                child.anims.play('sentinelleIdle', true); //et animation => gauche
+                child.setVelocity(0,0);
+            }
+                })
+        }
 
         function cleanProj(projectileP,obstacles){
             projectileP.destroy();
@@ -2217,35 +2469,30 @@ if (this.dashVal<0){this.dashVal = 0};
         }
 
         function powerDash(player,power){
+            if (this.keys.e.isDown){
             this.dash=true;
             power.disableBody(true, true);
             this.murBloqueur.create(800, 1120, 'murPorteVerticale').setScale(2).refreshBody();
             this.physics.add.collider(this.player, this.murBloqueur);
+            this.texteDashAff=true;
+            }
         }
 
         function powerTete(player,power){
             if (this.keys.e.isDown){
             this.teteDisponible=true;
-            power.disableBody(true, true);
-            this.affichagetete=this.texteTuto.create(600, 500, 'texteTete').setScale(4);
             this.texteTeteAff=true;
+            power.disableBody(true, true);
             }
         }
 
         function tutoPower(player,power){
-            if (this.texteIntAff==false){
-                this.affichageInt=this.texteTuto.create(600, 500, 'texteInteraction').setScale(4);
-                this.texteIntAff=true;
-            }
+            this.texteIntAff=true;
             if (this.keys.e.isDown && this.texteTirAff==false){
-                this.affichageInt.destroy();
             this.tir=true;
-            power.disableBody(true, true);
-            this.affichageTir=this.texteTuto.create(600, 500, 'texteTir').setScale(4);
             this.texteTirAff=true;
-            }
-            if(Phaser.Input.Keyboard.JustDown(this.keys.a) && this.texteTirAff==true){
-                this.affichageTir.destroy();
+            this.nbtexteAffichage=2;
+            power.disableBody(true, true);
             }
         }
     
@@ -2299,6 +2546,13 @@ if (this.dashVal<0){this.dashVal = 0};
             murCassable.destroy();
             }
         }
+
+
+        sentinelleCreer= function(index,game,x,y){
+            this.sentinelle = this.physics.add.sprite(300,300, 'sentinelleMouv').setScale(2);
+            this.sentinelle.name=index.toString();
+            this.sentinelle.setPushable(false);
+        }
         
 
             var config = {
@@ -2311,7 +2565,7 @@ if (this.dashVal<0){this.dashVal = 0};
                 debug: true
             }},
 
-            scene: [EcranAccueil,Plaine,Tuto,Donjon2,Donjon1]
+            scene: [EcranAccueil,Tuto,Plaine,Donjon1,Donjon2]
             };
             new Phaser.Game(config);
 
