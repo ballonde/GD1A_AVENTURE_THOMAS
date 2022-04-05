@@ -26,15 +26,10 @@
                 this.nbElementInventaire=0;
                 this.nbAile=0;
                 this.nbCle=0;
+                this.nbOeil=0;
                 this.nbAileMax=1;
                 this.dashVal=0;
                 this.texteTeteAff=false;
-                this.porte1=false;
-                this.partie1porte2=false;
-                this.partie2porte2=false;
-                this.partie1coffre=true;
-                this.partie2coffre=true;
-                this.coffre1=false;
                 this.texteDashAff=false;
                 this.nbtexteAffichage=0;
         }
@@ -45,14 +40,18 @@
             this.teteDisponible = data.teteDisponible;
             this.inventaireCle=data.inventaireCle;
             this.inventaireAile=data.inventaireAile;
+            this.inventaireOeil=data.inventaireOeil;
             this.tir=data.tir;
             this.coordPlayerX=data.coordPlayerX;
             this.coordPlayerY=data.coordPlayerY;
+            this.degatBoule=data.degatBoule;
+            this.vitesseBonus=data.vitesseBonus;
         }
         preload(){
             this.load.image('coffre', 'assets/coffre.png');
             this.load.image('inventaireCle', 'assets/inventaireCle.png');
             this.load.image('inventaireAile', 'assets/inventaireAile.png');
+            this.load.image('inventaireOeil', 'assets/inventaireOeil.png');
             this.load.image('lootAile', 'assets/loot_mob_aile.png');
             this.load.image('projectileP', 'assets/projectile_perso.png');
             this.load.image('power_up', 'assets/power_up.png');
@@ -80,6 +79,8 @@
             { frameWidth: 48, frameHeight: 32 });
             this.load.spritesheet('texteTutoSprite','assets/texteTutoSprite.png',
             { frameWidth: 96, frameHeight: 80 });
+            this.load.spritesheet('oeilSentinelle','assets/oeilSentinelle.png',
+            { frameWidth: 14, frameHeight: 14 });
 
 
             this.load.image('donjon_asset', 'assets/donjon.png');
@@ -211,7 +212,6 @@
             this.sentinelles.add(this.sentinelle);
             this.sentinelle.vie=40;
             this.sentinelle.setPushable(false);
-            console.log(this.sentinelle);
             this.sentinelle.direction='null';
             this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
             this.anims.create({
@@ -271,8 +271,25 @@
             this.physics.add.collider(this.projectileP, this.obstacles, cleanProj, null, this);
             this.physics.add.collider(this.projectileP, this.sentinelles, degatMonstre, null, this);
 
-            this.loot = this.physics.add.staticGroup();
+            this.loot = this.physics.add.group();
             this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
+
+
+
+            //this.aile=this.loot.create(sentinelle.x, sentinelle.y, 'lootAile');
+
+            this.oeilSentinelle = this.physics.add.sprite(2655,380, 'oeilSentinelle').setScale(2);
+            this.loot.add(this.oeilSentinelle);
+            this.oeilSentinelle.nom="oeil";
+            this.anims.create({
+                    key: 'oeilBrillant',
+                    frames: this.anims.generateFrameNumbers('oeilSentinelle', {start:0,end:8}),
+                    frameRate: 10,
+                    repeat: -1
+                });
+            this.oeilSentinelle.anims.play('oeilBrillant', true);
+
+
 
             this.anims.create({
                 key: 'teteup',
@@ -357,6 +374,12 @@ if (this.dashVal<0){this.dashVal = 0};
                 this.imgInventaire.setScrollFactor(0);
                 this.nbElementInventaire=this.nbElementInventaire+1;
                 this.nbCle=this.nbCle+1;
+            }
+            if (this.inventaireOeil==true && this.nbOeil<1){
+                this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireOeil').setScale(2).setDepth(0);
+                this.imgInventaire.setScrollFactor(0);
+                this.nbElementInventaire=this.nbElementInventaire+1;
+                this.nbOeil=this.nbOeil+1;
             }
 
             if (this.nouveauJoueur==true){
@@ -447,39 +470,39 @@ if (this.dashVal<0){this.dashVal = 0};
     if (this.dashVal==0){
         if (this.cursors.left.isDown){ 
             if (this.tete==true){
-                this.player.setVelocityX(-240); //alors vitesse négative en X
+                this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteleft', true);
             }else{
                         //si la touche gauche est appuyée
-            this.player.setVelocityX(-240); //alors vitesse négative en X
+            this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
             this.player.anims.play('left', true); //et animation => gauche
             this.player.direction = 'left';
             }
 
         }else if (this.cursors.right.isDown){
             if (this.tete==true){
-                this.player.setVelocityX(240); //alors vitesse négative en X
+                this.player.setVelocityX(240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteright', true);
             } else{
-                this.player.setVelocityX(240); //alors vitesse positive en X
+                this.player.setVelocityX(240-this.vitesseBonus); //alors vitesse positive en X
                 this.player.anims.play('right', true); //et animation => droite
                 this.player.direction = 'right';
                 }
         }else if (this.cursors.up.isDown){
             if (this.tete==true){
-                this.player.setVelocityY(-240); //alors vitesse négative en X
+                this.player.setVelocityY(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteup', true);
             }else{
-                this.player.setVelocityY(-240);
+                this.player.setVelocityY(-240-this.vitesseBonus);
                 this.player.anims.play('up', true);
                 this.player.direction = 'up';
                 }
         }else if (this.cursors.down.isDown){
                 if (this.tete==true){
-                    this.player.setVelocityY(240); //alors vitesse négative en X
+                    this.player.setVelocityY(240+this.vitesseBonus); //alors vitesse négative en X
                     this.player.anims.play('tetedown', true);
                 }else{
-                this.player.setVelocityY(240);
+                this.player.setVelocityY(240+this.vitesseBonus);
                 this.player.anims.play('down', true);
                 this.player.direction = 'down';
                 }
@@ -541,6 +564,7 @@ class Donjon2 extends Phaser.Scene{
                 this.nbElementInventaire=0;
                 this.nbAile=0;
                 this.nbCle=0;
+                this.nbOeil=0;
                 this.nbAileMax=1;
                 this.dashVal=0;
                 this.texteTeteAff=false;
@@ -560,14 +584,18 @@ class Donjon2 extends Phaser.Scene{
             this.teteDisponible = data.teteDisponible;
             this.inventaireCle=data.inventaireCle;
             this.inventaireAile=data.inventaireAile;
+            this.inventaireOeil=data.inventaireOeil;
             this.tir=data.tir;
             this.coordPlayerX=data.coordPlayerX;
             this.coordPlayerY=data.coordPlayerY;
+            this.degatBoule=data.degatBoule;
+            this.vitesseBonus=data.vitesseBonus;
         }
         preload(){
             this.load.image('coffre', 'assets/coffre.png');
             this.load.image('inventaireCle', 'assets/inventaireCle.png');
             this.load.image('inventaireAile', 'assets/inventaireAile.png');
+            this.load.image('inventaireOeil', 'assets/inventaireOeil.png');
             this.load.image('lootAile', 'assets/loot_mob_aile.png');
             this.load.image('projectileP', 'assets/projectile_perso.png');
             this.load.image('power_up', 'assets/power_up.png');
@@ -934,6 +962,12 @@ if (this.dashVal<0){this.dashVal = 0};
                 this.nbElementInventaire=this.nbElementInventaire+1;
                 this.nbCle=this.nbCle+1;
             }
+            if (this.inventaireOeil==true && this.nbOeil<1){
+                this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireOeil').setScale(2).setDepth(0);
+                this.imgInventaire.setScrollFactor(0);
+                this.nbElementInventaire=this.nbElementInventaire+1;
+                this.nbOeil=this.nbOeil+1;
+            }
 
             if (this.nouveauJoueur==true){
                 this.nouveauJoueur=false;
@@ -1022,39 +1056,39 @@ if (this.dashVal<0){this.dashVal = 0};
     if (this.dashVal==0){
         if (this.cursors.left.isDown){ 
             if (this.tete==true){
-                this.player.setVelocityX(-240); //alors vitesse négative en X
+                this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteleft', true);
             }else{
                         //si la touche gauche est appuyée
-            this.player.setVelocityX(-240); //alors vitesse négative en X
+            this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
             this.player.anims.play('left', true); //et animation => gauche
             this.player.direction = 'left';
             }
 
         }else if (this.cursors.right.isDown){
             if (this.tete==true){
-                this.player.setVelocityX(240); //alors vitesse négative en X
+                this.player.setVelocityX(240+this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteright', true);
             } else{
-                this.player.setVelocityX(240); //alors vitesse positive en X
+                this.player.setVelocityX(240+this.vitesseBonus); //alors vitesse positive en X
                 this.player.anims.play('right', true); //et animation => droite
                 this.player.direction = 'right';
                 }
         }else if (this.cursors.up.isDown){
             if (this.tete==true){
-                this.player.setVelocityY(-240); //alors vitesse négative en X
+                this.player.setVelocityY(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteup', true);
             }else{
-                this.player.setVelocityY(-240);
+                this.player.setVelocityY(-240-this.vitesseBonus);
                 this.player.anims.play('up', true);
                 this.player.direction = 'up';
                 }
         }else if (this.cursors.down.isDown){
                 if (this.tete==true){
-                    this.player.setVelocityY(240); //alors vitesse négative en X
+                    this.player.setVelocityY(240+this.vitesseBonus); //alors vitesse négative en X
                     this.player.anims.play('tetedown', true);
                 }else{
-                this.player.setVelocityY(240);
+                this.player.setVelocityY(240+this.vitesseBonus);
                 this.player.anims.play('down', true);
                 this.player.direction = 'down';
                 }
@@ -1118,6 +1152,7 @@ if (this.dashVal<0){this.dashVal = 0};
             this.nbElementInventaire=0;
             this.nbCle=0;
             this.nbAile=0;
+            this.nbOeil=0;
             this.nbAileMax=1;
             this.texteTirAff=false;
             this.texteIntAff=false;
@@ -1131,9 +1166,12 @@ if (this.dashVal<0){this.dashVal = 0};
             this.teteDisponible = data.teteDisponible;
             this.inventaireCle=data.inventaireCle;
             this.inventaireAile=data.inventaireAile;
+            this.inventaireOeil=data.inventaireOeil;
             this.tir=data.tir;
             this.coordPlayerX=data.coordPlayerX;
             this.coordPlayerY=data.coordPlayerY;
+            this.degatBoule=data.degatBoule;
+            this.vitesseBonus=data.vitesseBonus;
         }
 
             preload(){
@@ -1143,6 +1181,7 @@ if (this.dashVal<0){this.dashVal = 0};
 
             this.load.image('inventaireCle', 'assets/inventaireCle.png');
             this.load.image('inventaireAile', 'assets/inventaireAile.png');
+            this.load.image('inventaireOeil', 'assets/inventaireOeil.png');
             this.load.image('lootAile', 'assets/loot_mob_aile.png');
             this.load.image('projectileP', 'assets/projectile_perso.png');
             this.load.image('power_up', 'assets/power_up.png');
@@ -1347,8 +1386,7 @@ if (this.dashVal<0){this.dashVal = 0};
 
             this.argent = this.physics.add.sprite(40, 107, 'argent').setScale(2);
             this.argent.setScrollFactor(0);
-            this.afficheScore=0;
-            this.scoreArgent=this.add.text(50,100,': 0',{fontSize:'16px',fill:'#000'});
+            this.scoreArgent=this.add.text(50,100,':'+this.afficheScore,{fontSize:'16px',fill:'#f00'});
             this.scoreArgent.setScrollFactor(0);
 
             this.projectileP = this.physics.add.group();
@@ -1481,6 +1519,12 @@ if (this.dashVal<0){this.dashVal = 0};
                 this.nbElementInventaire=this.nbElementInventaire+1;
                 this.nbCle=this.nbCle+1;
             }
+            if (this.inventaireOeil==true && this.nbOeil<1){
+                this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireOeil').setScale(2).setDepth(0);
+                this.imgInventaire.setScrollFactor(0);
+                this.nbElementInventaire=this.nbElementInventaire+1;
+                this.nbOeil=this.nbOeil+1;
+            }
 
             if (this.nouveauJoueur==true){
                 this.nouveauJoueur=false;
@@ -1578,39 +1622,39 @@ if (this.dashVal<0){this.dashVal = 0};
 if (this.dashVal==0){
         if (this.cursors.left.isDown){ 
             if (this.tete==true){
-                this.player.setVelocityX(-240); //alors vitesse négative en X
+                this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteleft', true);
             }else{
                         //si la touche gauche est appuyée
-            this.player.setVelocityX(-240); //alors vitesse négative en X
+            this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
             this.player.anims.play('left', true); //et animation => gauche
             this.player.direction = 'left';
             }
 
         }else if (this.cursors.right.isDown){
             if (this.tete==true){
-                this.player.setVelocityX(240); //alors vitesse négative en X
+                this.player.setVelocityX(240+this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteright', true);
             } else{
-                this.player.setVelocityX(240); //alors vitesse positive en X
+                this.player.setVelocityX(240+this.vitesseBonus); //alors vitesse positive en X
                 this.player.anims.play('right', true); //et animation => droite
                 this.player.direction = 'right';
                 }
         }else if (this.cursors.up.isDown){
             if (this.tete==true){
-                this.player.setVelocityY(-240); //alors vitesse négative en X
+                this.player.setVelocityY(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteup', true);
             }else{
-                this.player.setVelocityY(-240);
+                this.player.setVelocityY(-240-this.vitesseBonus);
                 this.player.anims.play('up', true);
                 this.player.direction = 'up';
                 }
         }else if (this.cursors.down.isDown){
                 if (this.tete==true){
-                    this.player.setVelocityY(240); //alors vitesse négative en X
+                    this.player.setVelocityY(240+this.vitesseBonus); //alors vitesse négative en X
                     this.player.anims.play('tetedown', true);
                 }else{
-                this.player.setVelocityY(240);
+                this.player.setVelocityY(240+this.vitesseBonus);
                 this.player.anims.play('down', true);
                 this.player.direction = 'down';
                 }
@@ -1683,12 +1727,16 @@ if (this.dashVal==0){
                         vieJoueur:6, 
                         teteDisponible: false, 
                         dash:false, 
-                        afficheScore:0,
+                        afficheScore:999999,
                         inventaireAile:false,
-                        inventaireCle:false, 
+                        inventaireCle:false,
+                        inventaireOeil:false,
                         tir: false,
                         coordPlayerX: 450,
-                        coordPlayerY:300
+                        coordPlayerY:300,
+                        degatBoule:10,
+                        vitesseBonus:0,
+
                     });
                 }
             }
@@ -1731,8 +1779,12 @@ if (this.dashVal==0){
                 this.nbElementInventaire=0;
                 this.nbAile=0;
                 this.nbCle=0;
+                this.nbOeil=0;
                 this.nbAileMax=1;
                 this.dashVal=0;
+                this.achatVert=false;
+                this.achatOrange=false;
+                this.achatViolet=false;
         }
         init(data){
             this.vieJoueur = data.vieJoueur;
@@ -1742,12 +1794,16 @@ if (this.dashVal==0){
             this.teteDisponible = data.teteDisponible;
             this.inventaireCle=data.inventaireCle;
             this.inventaireAile=data.inventaireAile;
+            this.inventaireOeil=data.inventaireOeil;
             this.coordPlayerX=data.coordPlayerX;
             this.coordPlayerY=data.coordPlayerY;
+            this.degatBoule=data.degatBoule;
+            this.vitesseBonus=data.vitesseBonus;
         }
         preload(){
             this.load.image('inventaireCle', 'assets/inventaireCle.png');
             this.load.image('inventaireAile', 'assets/inventaireAile.png');
+            this.load.image('inventaireOeil', 'assets/inventaireOeil.png');
             this.load.image('lootAile', 'assets/loot_mob_aile.png');
             this.load.image('projectileP', 'assets/projectile_perso.png');
             this.load.image('carcasse_hero', 'assets/carcasse_hero.png');
@@ -1968,11 +2024,18 @@ if (this.dashVal==0){
 
             this.marchandises = this.physics.add.group();
             this.marchandise1=this.physics.add.sprite(850,500, 'marchandise').setScale(2);
+            this.marchandise1.id="vert";
+            this.marchandise1.prix=3000;
             this.marchandise2=this.physics.add.sprite(950,500, 'marchandise').setScale(2);
+            this.marchandise2.id="orange";
+            this.marchandise2.prix=1000;
             this.marchandise3=this.physics.add.sprite(1050,500, 'marchandise').setScale(2);
+            this.marchandise3.id="violet";
             this.marchandises.add(this.marchandise1);
             this.marchandises.add(this.marchandise2);
             this.marchandises.add(this.marchandise3);
+
+            this.physics.add.overlap(this.player, this.marchandises, achatMarchandises, null, this);
 
             this.prix = this.physics.add.staticGroup();
             this.prix.create(700, 450, 'prix').setScale(2);
@@ -2046,6 +2109,12 @@ if (this.dashVal==0){
 
 
         update(){
+            if (this.achatVert==true){
+                this.vitesseBonus=100;
+            }
+            if (this.achatOrange==true){
+                this.degatBoule=20;
+            }
 
             if ((this.input.keyboard.checkDown(this.keys.d,9000)==true)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000};
                 if (this.dashVal>0){
@@ -2078,6 +2147,12 @@ if (this.dashVal<0){this.dashVal = 0};
                 this.imgInventaire.setScrollFactor(0);
                 this.nbElementInventaire=this.nbElementInventaire+1;
                 this.nbCle=this.nbCle+1;
+            }
+            if (this.inventaireOeil==true && this.nbOeil<1){
+                this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireOeil').setScale(2).setDepth(0);
+                this.imgInventaire.setScrollFactor(0);
+                this.nbElementInventaire=this.nbElementInventaire+1;
+                this.nbOeil=this.nbOeil+1;
             }
 
             if (this.slime.x>this.player.x){
@@ -2178,39 +2253,39 @@ if (this.dashVal<0){this.dashVal = 0};
     if (this.dashVal==0){
         if (this.cursors.left.isDown){ 
             if (this.tete==true){
-                this.player.setVelocityX(-240); //alors vitesse négative en X
+                this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteleft', true);
             }else{
                         //si la touche gauche est appuyée
-            this.player.setVelocityX(-240); //alors vitesse négative en X
+            this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
             this.player.anims.play('left', true); //et animation => gauche
             this.player.direction = 'left';
             }
 
         }else if (this.cursors.right.isDown){
             if (this.tete==true){
-                this.player.setVelocityX(240); //alors vitesse négative en X
+                this.player.setVelocityX(240+this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteright', true);
             } else{
-                this.player.setVelocityX(240); //alors vitesse positive en X
+                this.player.setVelocityX(240+this.vitesseBonus); //alors vitesse positive en X
                 this.player.anims.play('right', true); //et animation => droite
                 this.player.direction = 'right';
                 }
         }else if (this.cursors.up.isDown){
             if (this.tete==true){
-                this.player.setVelocityY(-240); //alors vitesse négative en X
+                this.player.setVelocityY(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteup', true);
             }else{
-                this.player.setVelocityY(-240);
+                this.player.setVelocityY(-240-this.vitesseBonus);
                 this.player.anims.play('up', true);
                 this.player.direction = 'up';
                 }
         }else if (this.cursors.down.isDown){
                 if (this.tete==true){
-                    this.player.setVelocityY(240); //alors vitesse négative en X
+                    this.player.setVelocityY(240+this.vitesseBonus); //alors vitesse négative en X
                     this.player.anims.play('tetedown', true);
                 }else{
-                this.player.setVelocityY(240);
+                this.player.setVelocityY(240+this.vitesseBonus);
                 this.player.anims.play('down', true);
                 this.player.direction = 'down';
                 }
@@ -2244,16 +2319,16 @@ if (this.dashVal<0){this.dashVal = 0};
             proj.origineX=player.x;
             proj.origineY=player.y;
             if (player.direction == 'left') { 
-                proj.setVelocity(-400, 0);
+                proj.setVelocity(-400-this.vitesseBonus, 0);
             }
             if (player.direction == 'right') {
-                proj.setVelocity(400, 0); 
+                proj.setVelocity(400+this.vitesseBonus, 0); 
             }
             if (player.direction == 'up') {
-                proj.setVelocity(0, -400);
+                proj.setVelocity(0, -400-this.vitesseBonus);
             }
             if (player.direction == 'down') { 
-                proj.setVelocity(0, 400);
+                proj.setVelocity(0, 400+this.vitesseBonus);
             }
         }  
 
@@ -2332,7 +2407,7 @@ if (this.dashVal<0){this.dashVal = 0};
         }
         function degatMonstre(projectileP,sentinelle){
             projectileP.destroy();
-            sentinelle.vie=sentinelle.vie-10;
+            sentinelle.vie=sentinelle.vie-this.degatBoule;
             if (sentinelle.vie<=0){
                 sentinelle.destroy();
                 this.afficheScore=this.afficheScore+100+Math.floor(Math.random() * 50);
@@ -2362,9 +2437,12 @@ if (this.dashVal<0){this.dashVal = 0};
                 afficheScore:this.afficheScore,
                 inventaireCle:this.inventaireCle,
                 inventaireAile:this.inventaireAile,
+                inventaireOeil:this.inventaireOeil,
                 tir:this.tir,
                 coordPlayerX: 600,
-                coordPlayerY: 200
+                coordPlayerY: 200,
+                degatBoule:this.degatBoule,
+                vitesseBonus: this.vitesseBonus
         });
             }
         }
@@ -2377,9 +2455,12 @@ if (this.dashVal<0){this.dashVal = 0};
                 afficheScore:this.afficheScore,
                 inventaireCle:this.inventaireCle,
                 inventaireAile:this.inventaireAile,
+                inventaireOeil:this.inventaireOeil,
                 tir:this.tir,
                 coordPlayerX: 200,
-                coordPlayerY: 1000
+                coordPlayerY: 1000,
+                degatBoule:this.degatBoule,
+                vitesseBonus: this.vitesseBonus
         });
             }
         }
@@ -2392,9 +2473,14 @@ if (this.dashVal<0){this.dashVal = 0};
                 afficheScore:this.afficheScore,
                 inventaireCle:this.inventaireCle,
                 inventaireAile:this.inventaireAile,
+                inventaireOeil:this.inventaireOeil,
                 tir:this.tir,
                 coordPlayerX: 900,
-                coordPlayerY: 1000
+                coordPlayerY: 1000,
+                degatBoule:this.degatBoule,
+                vitesseBonus: this.vitesseBonus,
+                degatBoule:this.degatBoule,
+                vitesseBonus: this.vitesseBonus
         });
             }
         }
@@ -2407,9 +2493,12 @@ if (this.dashVal<0){this.dashVal = 0};
                 afficheScore:this.afficheScore,
                 inventaireCle:this.inventaireCle,
                 inventaireAile:this.inventaireAile,
+                inventaireOeil:this.inventaireOeil,
                 tir:this.tir,
                 coordPlayerX: 500,
-                coordPlayerY: 1900
+                coordPlayerY: 1900,
+                degatBoule:this.degatBoule,
+                vitesseBonus: this.vitesseBonus
         });
             }
         }
@@ -2422,9 +2511,12 @@ if (this.dashVal<0){this.dashVal = 0};
                 afficheScore:this.afficheScore,
                 inventaireCle:this.inventaireCle,
                 inventaireAile:this.inventaireAile,
+                inventaireOeil:this.inventaireOeil,
                 tir:this.tir,
                 coordPlayerX: 1200,
-                coordPlayerY: 230
+                coordPlayerY: 230,
+                degatBoule:this.degatBoule,
+                vitesseBonus: this.vitesseBonus
         });
             }
             if ( this.keys.e.isDown && escalierPlaine.x==900 && escalierPlaine.y==1000){
@@ -2435,9 +2527,12 @@ if (this.dashVal<0){this.dashVal = 0};
                 afficheScore:this.afficheScore,
                 inventaireCle:this.inventaireCle,
                 inventaireAile:this.inventaireAile,
+                inventaireOeil:this.inventaireOeil,
                 tir:this.tir,
                 coordPlayerX: 720,
-                coordPlayerY: 400
+                coordPlayerY: 400,
+                degatBoule:this.degatBoule,
+                vitesseBonus: this.vitesseBonus
                 });
             }
         }
@@ -2450,9 +2545,12 @@ if (this.dashVal<0){this.dashVal = 0};
                 afficheScore:this.afficheScore,
                 inventaireCle:this.inventaireCle,
                 inventaireAile:this.inventaireAile,
+                inventaireOeil:this.inventaireOeil,
                 tir:this.tir,
                 coordPlayerX: 1200,
-                coordPlayerY: 230
+                coordPlayerY: 230,
+                degatBoule:this.degatBoule,
+                vitesseBonus: this.vitesseBonus,
         });
             }
 
@@ -2465,6 +2563,25 @@ if (this.dashVal<0){this.dashVal = 0};
                 this.nouveauJoueur=true;
                 carcasse.destroy();
                 this.coeur=false;
+            }
+        }
+
+        function achatMarchandises(player,marchandise){
+            if (this.keys.e.isDown && marchandise.prix<this.afficheScore){
+            this.afficheScore=this.afficheScore-marchandise.prix;
+            this.scoreArgent.setText(': ' + this.afficheScore);
+            this.scoreArgent.updateText();
+            marchandise.disableBody(true, true);
+            if (marchandise.id="vert"){
+                this.achatVert=true;
+            }
+            if (marchandise.id="orange"){
+                this.achatOrange=true;
+            }
+            }
+            if (this.keys.e.isDown && this.inventaireOeil==true && marchandise.id=="violet"){
+            this.inventaireOeil=false;
+            marchandise.disableBody(true, true);
             }
         }
 
@@ -2521,6 +2638,8 @@ if (this.dashVal<0){this.dashVal = 0};
                 }else{
                     this.inventaireAile=true;
                 }
+            }else if (loot.nom=="oeil"){
+                this.inventaireOeil=true;
             }
            // updateAffichageInventaire(player);
             //this.objetInventaire.push(loot);
