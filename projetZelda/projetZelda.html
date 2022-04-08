@@ -1572,6 +1572,50 @@ if (this.inventaireAile==true && this.nbAile<1){
         }
 
         update(){
+
+
+            this.input.gamepad.once('connected', function (pad) {
+                this.scene.paddle = pad;
+                this.scene.padConnected = true;
+                this.tirManette=this.paddle.X;
+            });    
+
+            // quand la manette est connectée, les touches manettes sont activées
+            if (this.padConnected==true) {
+                console.log("x:"+this.paddle.rightStick.x);
+                console.log("y:"+this.paddle.rightStick.y);
+
+
+                this.moveUp = (this.cursors.up.isDown ||  this.paddle.up ||  (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y<=-0.8));  
+                this.moveRight = (this.cursors.right.isDown ||  this.paddle.left || (this.paddle.rightStick.x>=0.8 && this.paddle.rightStick.y<=0.8 && this.paddle.rightStick.y>=-0.8));
+                this.moveLeft = (this.cursors.left.isDown || this.paddle.right || (this.paddle.rightStick.x<=-0.8 && this.paddle.rightStick.y<=0.8 && this.paddle.rightStick.y>=-0.8));
+                this.moveDown = (this.cursors.down.isDown || this.paddle.up || (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y>=0.8));  
+
+                //this.tirBonton= this.paddle.A;
+                this.DashBonton=(this.keys.e.isDown ||  this.paddle.B);
+                this.TeteBonton=(this.cursors.space.isDown ||  this.paddle.Y);
+                this.tirBonton= (this.keys.a || this.paddle.A);
+                this.InteractionBonton=(this.keys.e.isDown || this.paddle.X);
+
+                /*                this.moveUp = (this.cursors.up.isDown ||  this.paddle.up ||  (this.paddle.rightStick.x<=1.2 && this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.y>=-0.8 && this.paddle.rightStick.y<=0.8));  
+                this.moveLeft = (this.cursors.left.isDown ||  this.paddle.up || (this.paddle.rightStick.y>=-0.8 && this.paddle.rightStick.y<=0.8));
+                this.moveRight = (this.cursors.right.isDown || this.paddle.right || (this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.x>=-0.8));
+                this.moveDown = (this.cursors.down.isDown || this.paddle.up || (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y>=-0.8 && this.paddle.rightStick.y<=1.2));
+                */
+            }else{
+                this.moveUp = (this.cursors.up.isDown);
+                this.moveLeft = (this.cursors.left.isDown);  
+                this.moveRight = (this.cursors.right.isDown);
+                this.moveDown = (this.cursors.down.isDown);
+                this.tirBonton= this.keys.a;
+                this.DashBonton=(this.keys.d.isDown);
+                this.InteractionBonton=(this.keys.e.isDown);
+              //  this.TeteBonton=(this.cursors.space.isDown);
+            }
+
+
+
+
             this.sentinelles.children.iterate(function (child) {
                 
                 if (child.direction=="right"){
@@ -1601,7 +1645,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.texteTutoAffichage1.anims.play('texteInteraction', true); //et animation => gauche
                 this.nbtexteAffichage=1;
             }
-            if (this.keys.e.isDown && this.texteIntAff==true){ 
+            if (this.InteractionBonton && this.texteIntAff==true){ 
                 this.texteTutoAffichage1.destroy();
                 this.texteIntAff==false;
             }
@@ -1611,7 +1655,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.texteTutoAffichage2.anims.play('texteTir', true); //et animation => gauche
                 this.nbtexteAffichage=3;
             }
-            if (this.keys.a.isDown && this.texteTirAff==true){ 
+            if (this.tirBonton && this.texteTirAff==true){ 
                 this.texteTutoAffichage2.destroy();
                 this.texteTirAff==false;
                 this.nbtexteAffichage=3;
@@ -1732,7 +1776,7 @@ if (this.inventaireAile==true && this.nbAile<1){
         }
 
 
-        if ((this.input.keyboard.checkDown(this.keys.d,9000)==true)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000};
+        if ((this.input.keyboard.checkDown(this.DashBonton,9000)==true)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000};
                 if (this.dashVal>0){
                     this.dashVal = this.dashVal -600
                     this.player.setVelocity(0,0);
@@ -1752,8 +1796,9 @@ if (this.inventaireAile==true && this.nbAile<1){
                 };
 if (this.dashVal<0){this.dashVal = 0};
 
+
 if (this.dashVal==0){
-        if (this.cursors.left.isDown){ 
+        if (this.moveLeft){ 
             if (this.tete==true){
                 this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteleft', true);
@@ -1764,7 +1809,7 @@ if (this.dashVal==0){
             this.player.direction = 'left';
             }
 
-        }else if (this.cursors.right.isDown){
+        }else if (this.moveRight){
             if (this.tete==true){
                 this.player.setVelocityX(240+this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteright', true);
@@ -1773,7 +1818,7 @@ if (this.dashVal==0){
                 this.player.anims.play('right', true); //et animation => droite
                 this.player.direction = 'right';
                 }
-        }else if (this.cursors.up.isDown){
+        }else if (this.moveUp){
             if (this.tete==true){
                 this.player.setVelocityY(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteup', true);
@@ -1782,7 +1827,7 @@ if (this.dashVal==0){
                 this.player.anims.play('up', true);
                 this.player.direction = 'up';
                 }
-        }else if (this.cursors.down.isDown){
+        }else if (this.moveDown){
                 if (this.tete==true){
                     this.player.setVelocityY(240+this.vitesseBonus); //alors vitesse négative en X
                     this.player.anims.play('tetedown', true);
@@ -1802,12 +1847,12 @@ if (this.dashVal==0){
                     this.player.anims.play('turn', true); //animation fait face caméra
                 }}
             }
-
-                if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false && this.tir==true) {
-                    this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
-            this.proj.vitesse=this.vitesseBonus;
-            tirer(this.player,this.proj);
-            } 
+            //this.keys.a.isDown ||  this.paddle.A
+                if ( Phaser.Input.Keyboard.JustDown(this.keys.a || this.tirManette) && this.tete==false && this.tir==true) {
+                this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
+                this.proj.vitesse=this.vitesseBonus;
+                tirer(this.player,this.proj);
+                } 
             }
         };
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1857,22 +1902,22 @@ if (this.dashVal==0){
             }
             update(){
                 if ( this.keys.a.isDown){
-                    this.scene.start('Donjon1',{
+                    this.scene.start('Tuto',{
                         vieJoueur:6, 
-                        teteDisponible: false, 
-                        dash:false, 
+                        teteDisponible: true, 
+                        dash:true, 
                         afficheScore:999999,
-                        inventaireAile:true,
+                        inventaireAile:false,
                         inventaireCle:false,
                         inventaireOeil:true,
-                        tir: false,
+                        tir: true,
                         coordPlayerX: 450,
                         coordPlayerY:300,
                         degatBoule:10,
                         vitesseBonus:0,
                         armorUnlock:false,
                         compteurArmor:0,
-                        nbAileMax:4,
+                        nbAileMax:0,
                         nbCle:0,
                         nbAile:0,
                         nbOeil:0,
@@ -2618,7 +2663,7 @@ if (this.inventaireAile==true && this.nbAile<1){
         }
 
         function passagePlaine(player,portail){
-        if ( this.keys.e.isDown){
+        if ( this.InteractionBonton){
             this.scene.start('Plaine',{
                 vieJoueur:this.vieJoueur,
                 teteDisponible: this.teteDisponible, 
@@ -2963,7 +3008,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 arcade: {
                 debug: true
             }},
-
+            input : {gamepad:true},
             scene: [EcranAccueil,Tuto,Plaine,Donjon1,Donjon2]
             };
             new Phaser.Game(config);
