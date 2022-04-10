@@ -432,6 +432,7 @@
                 this.TeteBonton=(this.cursors.space.isDown);
             }
 
+            //mouvement ennemi
             this.sentinelles.children.iterate(function (child) {
                 
                 if (child.direction=="right"){
@@ -1295,7 +1296,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.texteSentinelle.destroy();
             }
 
-
+//mouvement ennemi
             this.sentinelles.children.iterate(function (child) {
                 
                 if (child.direction=="right"){
@@ -1382,7 +1383,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 }
             }
 
-
+//power-up armure
             if (this.compteurArmor != 0 && this.armorUnlock==true && this.armor==false){
             this.compteurArmor=this.compteurArmor-1;
             }
@@ -1401,6 +1402,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.nbArmure=1;
             }
 
+//affichage des messages tuto
             if ( this.texteDashAff==true && this.nbtexteAffichage==0){
                 this.texteTutoAffichage = this.physics.add.sprite(this.barreVie.x+500,this.barreVie.y+350, 'texteTutoSprite').setScale(4).refreshBody();
                 this.texteTutoAffichage.setScrollFactor(0);
@@ -1424,6 +1426,8 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.compteurDashbonton=this.compteurDashbonton-1;
             }
             console.log(this.compteurDashbonton);
+
+            //dash
             if ((this.paddle.B==true && this.compteurDashbonton==0)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000;this.compteurDashbonton=9};
                 if (this.dashVal>0){
                     this.dashVal = this.dashVal -600
@@ -1463,6 +1467,8 @@ if (this.inventaireAile==true && this.nbAile<1){
                 };
 if (this.dashVal<0){this.dashVal = 0};
 
+//gestion inventaire
+
 if (this.inventaireAile==true && this.nbAile<1){
                 this.imgInventaire1 = this.physics.add.sprite(this.barreVie.x-30+(64*1), this.barreVie.y+450, 'inventaireAile').setScale(2).setDepth(0);
                 this.imgInventaire1.setScrollFactor(0);
@@ -1485,7 +1491,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.nbElementInventaire=this.nbElementInventaire+1;
                 this.nbOeil=this.nbOeil+1;
             }
-
+//creation nouveau joueur
             if (this.nouveauJoueur==true){
                 this.nouveauJoueur=false;
                 this.player.destroy();
@@ -1512,7 +1518,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.physics.add.overlap(this.player, this.pnjSentinelle, pnjSentinelleDialogue, null, this);
                 this.physics.add.overlap(this.player, this.power, powerDash, null, this);
         }
-
+//creation tete
         if (this.tete==true && this.compteurTete==0){
             this.compteurTete=1;
             this.carcasse.create(this.player.x, this.player.y, 'carcasse_hero').setScale(2);
@@ -1531,7 +1537,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.physics.add.overlap(this.player, this.sentinelles, degat, null, this);
             
         }
-
+//frame invulnérabilité
         if(this.invincible == true){
             this.compteurInva-- ;
             this.player.setTint(0xff0000);
@@ -1542,6 +1548,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             }
         }
 
+//barre de vie
         if (this.vieJoueur==6){
             this.barreVie.anims.play('barreVie6', true); //et animation => gauche
         }
@@ -1573,6 +1580,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.tete=true; //et animation => gauche
         }
 
+        //deplacement
     if (this.dashVal==0){
         if (this.moveLeft){ 
             if (this.tete==true){
@@ -1644,7 +1652,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                     this.premierFois=false;
                 }
             }
-
+//tir
             if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false && this.tir==true) {
                 this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
                 this.proj.vitesse=this.vitesseBonus;
@@ -2138,6 +2146,8 @@ class Donjon2 extends Phaser.Scene{
                 this.TeteBonton=(this.cursors.space.isDown);
             }
 
+            //mouvement ennemi
+
             if (this.sentinelle1.ia==2){
 
                 if (Phaser.Math.Distance.Between(this.player.x,this.player.y,this.sentinelle1.x,this.sentinelle1.y)<=300){
@@ -2222,7 +2232,7 @@ if (this.sentinelle3.agro==false){
     this.sentinelle3.anims.play('sentinelleIdle', true);
 }
 }
-
+//power-up armure
             if (this.compteurArmor != 0 && this.armorUnlock==true && this.armor==false){
             this.compteurArmor=this.compteurArmor-1;
             }
@@ -2241,6 +2251,7 @@ if (this.sentinelle3.agro==false){
                 this.nbArmure=1;
             }
 
+            //mouvement ennemi
             this.sentinelles.children.iterate(function (child) {
                 
                 if (child.direction=="right"){
@@ -2265,6 +2276,7 @@ if (this.sentinelle3.agro==false){
                    })
 
 
+                   //affichage texte tuto
             if ( this.texteTeteAff==true && this.nbtexteAffichage==0){
                 this.texteTutoAffichage = this.physics.add.sprite(this.barreVie.x+550,this.barreVie.y+300, 'texteTutoSprite').setScale(4).refreshBody();
                 this.texteTutoAffichage.setScrollFactor(0);
@@ -2280,7 +2292,7 @@ if (this.sentinelle3.agro==false){
             if (this.compteurDashbonton!=0){
             this.compteurDashbonton=this.compteurDashbonton-1;
             }
-
+//dash
             if ((this.paddle.B==true && this.compteurDashbonton==0)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000;this.compteurDashbonton=9};
                 if (this.dashVal>0){
                     this.dashVal = this.dashVal -600
@@ -2320,6 +2332,7 @@ if (this.sentinelle3.agro==false){
                 };
 if (this.dashVal<0){this.dashVal = 0};
 
+//gestion inventaire
 if (this.inventaireAile==true && this.nbAile<1){
                 this.imgInventaire1 = this.physics.add.sprite(this.barreVie.x-30+(64*1), this.barreVie.y+450, 'inventaireAile').setScale(2).setDepth(0);
                 this.imgInventaire1.setScrollFactor(0);
@@ -2386,7 +2399,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.physics.add.overlap(this.player, this.sentinelles, degat, null, this);
             
         }
-
+//frame invunérabilité
         if(this.invincible == true){
             this.compteurInva-- ;
             this.player.setTint(0xff0000);
@@ -2396,7 +2409,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.invincible = false ;
             }
         }
-
+//barre de vie
         if (this.vieJoueur==6){
             this.barreVie.anims.play('barreVie6', true); //et animation => gauche
         }
@@ -2427,7 +2440,7 @@ if (this.inventaireAile==true && this.nbAile<1){
         if (this.TeteBonton && this.teteDisponible==true){ //si la touche gauche est appuyée
             this.tete=true; //et animation => gauche
         }
-
+//deplacement
     if (this.dashVal==0){
         if (this.moveLeft){ 
             if (this.tete==true){
@@ -2499,7 +2512,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                     this.premierFois=false;
                 }
             }
-
+//tir
             if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false && this.tir==true) {
                 this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
                 this.proj.vitesse=this.vitesseBonus;
@@ -2889,7 +2902,7 @@ if (this.inventaireAile==true && this.nbAile<1){
 
 
 
-
+//mouvement ennemi
             this.sentinelles.children.iterate(function (child) {
                 
                 if (child.direction=="right"){
@@ -2912,7 +2925,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                    child.setVelocity(0,0);
                }
                    })
-
+//texte Tuto affichage
             if ( this.texteIntAff==true && this.nbtexteAffichage==0){
                 this.texteTutoAffichage1 = this.physics.add.sprite(this.barreVie.x+350,this.barreVie.y+200, 'texteTutoSprite').setScale(4);
                 this.texteTutoAffichage1.setScrollFactor(0);
@@ -2934,7 +2947,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.texteTirAff==false;
                 this.nbtexteAffichage=3;
             }
-
+//gestion inventaire
             if (this.inventaireAile==true && this.nbAile<1){
                 this.imgInventaire1 = this.physics.add.sprite(this.barreVie.x-30+(64*1), this.barreVie.y+450, 'inventaireAile').setScale(2).setDepth(0);
                 this.imgInventaire1.setScrollFactor(0);
@@ -2998,7 +3011,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.physics.add.overlap(this.player, this.sentinelles, degat, null, this);
         }
 
-
+//power-up armure
         if (this.compteurArmor != 0 && this.armorUnlock==true && this.armor==false){
             this.compteurArmor=this.compteurArmor-1;
             }
@@ -3016,7 +3029,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.vieArmure.setScrollFactor(0);
                 this.nbArmure=1;
             }
-
+//frames invulnérabilité
         if(this.invincible == true){
             this.compteurInva-- ;
             this.player.setTint(0xff0000);
@@ -3026,7 +3039,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.invincible = false ;
             }
         }
-
+//barre de vie
         if (this.vieJoueur==6){
             this.barreVie.anims.play('barreVie6', true); //et animation => gauche
         }
@@ -3053,7 +3066,7 @@ if (this.inventaireAile==true && this.nbAile<1){
         if (this.gameOver){
             this.scene.start("EcranAccueil");
         }
-
+//dash
         if (this.padConnected==true){
             if (this.compteurDashbonton!=0){
             this.compteurDashbonton=this.compteurDashbonton-1;
@@ -3097,7 +3110,7 @@ if (this.inventaireAile==true && this.nbAile<1){
 
                 };
 if (this.dashVal<0){this.dashVal = 0};
-
+//deplacement
 
 if (this.dashVal==0){
         if (this.moveLeft){ 
@@ -3149,7 +3162,7 @@ if (this.dashVal==0){
                     this.player.anims.play('turn', true); //animation fait face caméra
                 }}
             }
-
+//tire
             //this.keys.a.isDown ||  this.paddle.A
             if (this.padConnected){
                 if (this.paddle.A){
@@ -3223,9 +3236,9 @@ if (this.dashVal==0){
                         dash:false, 
                         afficheScore:0,
                         inventaireAile:false,
-                        inventaireCle:true,
+                        inventaireCle:false,
                         inventaireOeil:false,
-                        tir: true,
+                        tir: false,
                         coordPlayerX: 450,
                         coordPlayerY:300,
                         degatBoule:10,
@@ -3596,7 +3609,7 @@ if (this.dashVal==0){
                 this.InteractionBonton=(this.keys.e.isDown);
                 this.TeteBonton=(this.cursors.space.isDown);
             }
-
+//marchant achat
             if (this.achatVert==true){
                 this.degatBoule=20;
             }
@@ -3606,7 +3619,7 @@ if (this.dashVal==0){
 
             if (this.achatViolet==true){
             this.armorUnlock=true;
-            }
+            }//power up armure
             if (this.compteurArmor != 0 && this.armorUnlock==true && this.armor==false){
             this.compteurArmor=this.compteurArmor-1;
             }
@@ -3629,6 +3642,7 @@ if (this.dashVal==0){
             if (this.compteurDashbonton!=0){
             this.compteurDashbonton=this.compteurDashbonton-1;
             }
+            //dash
 
             if ((this.paddle.B==true && this.compteurDashbonton==0)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000;this.compteurDashbonton=9};
                 if (this.dashVal>0){
@@ -3668,7 +3682,7 @@ if (this.dashVal==0){
 
                 };
 if (this.dashVal<0){this.dashVal = 0};
-
+//gestion Inventaire
 if (this.inventaireAile==true && this.nbAile<1){
                 this.imgInventaire1 = this.physics.add.sprite(this.barreVie.x-30+(64*1), this.barreVie.y+450, 'inventaireAile').setScale(2).setDepth(0);
                 this.imgInventaire1.setScrollFactor(0);
@@ -3731,7 +3745,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
             
         }
-
+//frame invul
         if(this.invincible == true){
             this.compteurInva-- ;
             this.player.setTint(0xff0000);
@@ -3741,7 +3755,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.invincible = false ;
             }
         }
-
+//vie joueur
         if (this.vieJoueur==6){
             this.barreVie.anims.play('barreVie6', true); //et animation => gauche
         }
@@ -3772,7 +3786,7 @@ if (this.inventaireAile==true && this.nbAile<1){
         if (this.TeteBonton && this.teteDisponible==true){ //si la touche gauche est appuyée
             this.tete=true; //et animation => gauche
         }
-
+//mouvement
     if (this.dashVal==0){
         if (this.moveLeft){ 
             if (this.tete==true){
@@ -3844,7 +3858,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                     this.premierFois=false;
                 }
             }
-
+//tir
             if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false && this.tir==true) {
             this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
             this.proj.vitesse=this.vitesseBonus;
@@ -3852,6 +3866,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             } 
         }};
 
+//function de tir
         function tirer(player,proj) {
             proj.origineX=player.x;
             proj.origineY=player.y;
@@ -3912,7 +3927,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 }
             }
         }
-
+//function pour detruire projectile 
         function cleanProj(projectileP,obstacles){
             projectileP.destroy();
         }
@@ -3971,7 +3986,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 coffre.destroy();
             }
         }
-
+//function de changement de scene
         function passagePlaine(player,portail){
         if ( this.InteractionBonton){
             this.scene.start('Plaine',{
@@ -4164,7 +4179,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.sentinelle1EnVie=true;
             this.sentinelle2EnVie=true;
         }
-
+//function pour recupere un corps en tete
         function retourCorps(player,carcasse){
             if (this.InteractionBonton){
                 this.compteurTete=0;
@@ -4174,7 +4189,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.coeur=false;
             }
         }
-
+//function pour le pnj
         function pnjSentinelleDialogue(player,pnjSentinelle){
             if (this.texteDialogue!=true){
             this.texteSentinelle.create(850, 1600, 'texteSentinelle').setScale(2).setDepth(3);
@@ -4195,7 +4210,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.queteFini=true;
             }
         }
-
+//function pour acheter au marchant
         function achatMarchandises(player,marchandise){
             if (this.InteractionBonton && marchandise.prix<this.afficheScore){
             this.afficheScore=this.afficheScore-marchandise.prix;
@@ -4216,7 +4231,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             marchandise.disableBody(true, true);
             }
         }
-
+//function de power up
         function powerDash(player,power){
             if (this.InteractionBonton){
             this.dash=true;
