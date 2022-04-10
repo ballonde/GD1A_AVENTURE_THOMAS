@@ -281,7 +281,7 @@
             this.bossGroup = this.physics.add.group();
             this.boss = this.physics.add.sprite(800,500, 'boss').setScale(2);
             this.boss.direction='null';
-            this.boss.vie=200;
+            this.boss.vie=1000;
             this.bossGroup.add(this.boss);
             this.anims.create({
                 key: 'idleDeplacementBoss',
@@ -401,6 +401,36 @@
 
 
         update(){
+
+            this.input.gamepad.once('connected', function (pad) {
+                this.scene.paddle = pad;
+                this.scene.padConnected = true;
+               // this.tirManette=this.paddle.X;
+            });    
+
+            // quand la manette est connectée, les touches manettes sont activées
+            if (this.padConnected==true) {
+
+                this.moveUp = (this.cursors.up.isDown ||  this.paddle.up ||  (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y<=-0.8));  
+                this.moveRight = (this.cursors.right.isDown ||  this.paddle.left || (this.paddle.rightStick.x>=0.8 && this.paddle.rightStick.y<=0.8 && this.paddle.rightStick.y>=-0.8));
+                this.moveLeft = (this.cursors.left.isDown || this.paddle.right || (this.paddle.rightStick.x<=-0.8 && this.paddle.rightStick.y<=0.8 && this.paddle.rightStick.y>=-0.8));
+                this.moveDown = (this.cursors.down.isDown || this.paddle.up || (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y>=0.8));  
+
+                this.DashBonton=(this.keys.d ||  this.paddle.B);
+                this.TeteBonton=(this.cursors.space.isDown ||  this.paddle.Y);
+                this.tirBonton= (this.keys.a || this.paddle.A);
+                this.InteractionBonton=(this.keys.e.isDown || this.paddle.X);
+
+            }else{
+                this.moveUp = (this.cursors.up.isDown);
+                this.moveLeft = (this.cursors.left.isDown);  
+                this.moveRight = (this.cursors.right.isDown);
+                this.moveDown = (this.cursors.down.isDown);
+                this.tirBonton= this.keys.a;
+                this.DashBonton=(this.keys.d);
+                this.InteractionBonton=(this.keys.e.isDown);
+                this.TeteBonton=(this.cursors.space.isDown);
+            }
 
             this.sentinelles.children.iterate(function (child) {
                 
@@ -595,6 +625,31 @@
                 this.texteDashAff==false;
             }
 
+            if (this.padConnected==true){
+            if (this.compteurDashbonton!=0){
+            this.compteurDashbonton=this.compteurDashbonton-1;
+            }
+            console.log(this.compteurDashbonton);
+            if ((this.paddle.B==true && this.compteurDashbonton==0)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000;this.compteurDashbonton=9};
+                if (this.dashVal>0){
+                    this.dashVal = this.dashVal -600
+                    this.player.setVelocity(0,0);
+                    if (this.player.direction == "down"){
+                        this.player.setVelocityY(600);
+                    }
+                    else if (this.player.direction == "left"){
+                        this.player.setVelocityX(-600);
+                    }
+                    else if (this.player.direction == "up"){
+                        this.player.setVelocityY(-600);
+                    }
+                    else if (this.player.direction == "right"){
+                        this.player.setVelocityX(600);
+                    }
+        }
+    }
+
+
             if ((this.input.keyboard.checkDown(this.keys.d,9000)==true)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000};
                 if (this.dashVal>0){
                     this.dashVal = this.dashVal -600
@@ -719,12 +774,12 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.scene.start("EcranAccueil");
         }
 
-        if (this.cursors.space.isDown && this.teteDisponible==true){ //si la touche gauche est appuyée
+        if (this.TeteBonton && this.teteDisponible==true){ //si la touche gauche est appuyée
             this.tete=true; //et animation => gauche
         }
 
     if (this.dashVal==0){
-        if (this.cursors.left.isDown){ 
+        if (this.moveLeft){ 
             if (this.tete==true){
                 this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteleft', true);
@@ -735,7 +790,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.player.direction = 'left';
             }
 
-        }else if (this.cursors.right.isDown){
+        }else if (this.moveRight){
             if (this.tete==true){
                 this.player.setVelocityX(240+this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteright', true);
@@ -744,7 +799,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.player.anims.play('right', true); //et animation => droite
                 this.player.direction = 'right';
                 }
-        }else if (this.cursors.up.isDown){
+        }else if (this.moveUp){
             if (this.tete==true){
                 this.player.setVelocityY(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteup', true);
@@ -753,7 +808,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.player.anims.play('up', true);
                 this.player.direction = 'up';
                 }
-        }else if (this.cursors.down.isDown){
+        }else if (this.moveDown){
                 if (this.tete==true){
                     this.player.setVelocityY(240+this.vitesseBonus); //alors vitesse négative en X
                     this.player.anims.play('tetedown', true);
@@ -781,6 +836,18 @@ if (this.inventaireAile==true && this.nbAile<1){
                     this.player.setVelocity(0,0);
                 }
             }
+            if (this.padConnected){
+                if (this.paddle.A){
+                    if ( this.paddle.A && this.tete==false && this.tir==true && this.premierFois==false) {
+                    this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
+                    this.proj.vitesse=this.vitesseBonus;
+                    this.premierFois=true;
+                    tirer(this.player,this.proj);
+                    }
+                }else{
+                    this.premierFois=false;
+                }
+            }
 
             if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false && this.tir==true) {
                 this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
@@ -789,6 +856,16 @@ if (this.inventaireAile==true && this.nbAile<1){
             } 
         }};
 
+        ///////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////:
+        /////////////////////////////////////////////////////////////////////////////////::
+        ///////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////:
+        /////////////////////////////////////////////////////////////////////////////////::   
         ///////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////
@@ -817,6 +894,8 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.armor=false;
                 this.nbArmure=0;
                 this.compteurEnnemiDonjon1=0;
+                this.sentinelle2App=false;
+                this.sentinelle1App=false;
         }
         init(data){
             this.vieJoueur = data.vieJoueur;
@@ -852,6 +931,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.load.image('escalierDonjon', 'assets/escalierDonjon.png');
             this.load.image('murCassable', 'assets/murCassable.png');
             this.load.image('murPorteVerticale', 'assets/murPorteVertical.png');
+            this.load.image('texteSentinelle', 'assets/texteQueteSentinelle.png');
 
 
             this.load.spritesheet('sentinelleMouv', 'assets/mob_spritesheet_deplacement.png',
@@ -1026,7 +1106,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.sentinelle.direction='left';
             this.sentinelle.agro=false;
 
-            this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+            this.physics.add.overlap(this.player, this.sentinelles, degat, null, this);
             this.physics.add.collider(this.sentinelles, this.obstacles,changeOrSenti, null,this);
             this.anims.create({
                 key: 'sentinelleUp',
@@ -1077,6 +1157,10 @@ if (this.inventaireAile==true && this.nbAile<1){
                 repeat: -1
             });
             this.pnjSentinelle.anims.play('pnjSentinelleEndommage', true);
+
+            this.texteSentinelle = this.physics.add.group();
+            
+
 
 
             this.power = this.physics.add.staticGroup();
@@ -1169,9 +1253,46 @@ if (this.inventaireAile==true && this.nbAile<1){
 
 
         update(){
-            console.log(this.compteurEnnemiDonjon1);
+
+            //this.texteSentinelle.setVisible(false);
+
+            this.input.gamepad.once('connected', function (pad) {
+                this.scene.paddle = pad;
+                this.scene.padConnected = true;
+               // this.tirManette=this.paddle.X;
+            });    
+
+            // quand la manette est connectée, les touches manettes sont activées
+            if (this.padConnected==true) {
+
+                this.moveUp = (this.cursors.up.isDown ||  this.paddle.up ||  (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y<=-0.8));  
+                this.moveRight = (this.cursors.right.isDown ||  this.paddle.left || (this.paddle.rightStick.x>=0.8 && this.paddle.rightStick.y<=0.8 && this.paddle.rightStick.y>=-0.8));
+                this.moveLeft = (this.cursors.left.isDown || this.paddle.right || (this.paddle.rightStick.x<=-0.8 && this.paddle.rightStick.y<=0.8 && this.paddle.rightStick.y>=-0.8));
+                this.moveDown = (this.cursors.down.isDown || this.paddle.up || (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y>=0.8));  
+
+                this.DashBonton=(this.keys.d ||  this.paddle.B);
+                this.TeteBonton=(this.cursors.space.isDown ||  this.paddle.Y);
+                this.tirBonton= (this.keys.a || this.paddle.A);
+                this.InteractionBonton=(this.keys.e.isDown || this.paddle.X);
+
+            }else{
+                this.moveUp = (this.cursors.up.isDown);
+                this.moveLeft = (this.cursors.left.isDown);  
+                this.moveRight = (this.cursors.right.isDown);
+                this.moveDown = (this.cursors.down.isDown);
+                this.tirBonton= this.keys.a;
+                this.DashBonton=(this.keys.d);
+                this.InteractionBonton=(this.keys.e.isDown);
+                this.TeteBonton=(this.cursors.space.isDown);
+            }
+
             if (this.compteurEnnemiDonjon1==7){
                 this.murBloqueur2.destroy();
+            }
+
+
+            if (this.queteFini==true && this.texteDialogue==true && this.InteractionBonton){
+                this.texteSentinelle.destroy();
             }
 
 
@@ -1286,10 +1407,41 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.texteTutoAffichage.anims.play('texteDash', true); //et animation => gauche
                 this.nbtexteAffichage=1;
             }
-            if (this.keys.d.isDown && this.texteDashAff==true){ 
+            if (this.padConnected){
+                if ((this.keys.d.isDown || this.paddle.B)&& this.texteDashAff==true){ 
                 this.texteTutoAffichage.destroy();
                 this.texteDashAff==false;
             }
+            }
+            if (this.keys.d.isDown&& this.texteDashAff==true){ 
+                this.texteTutoAffichage.destroy();
+                this.texteDashAff==false;
+            }
+
+
+            if (this.padConnected==true){
+            if (this.compteurDashbonton!=0){
+            this.compteurDashbonton=this.compteurDashbonton-1;
+            }
+            console.log(this.compteurDashbonton);
+            if ((this.paddle.B==true && this.compteurDashbonton==0)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000;this.compteurDashbonton=9};
+                if (this.dashVal>0){
+                    this.dashVal = this.dashVal -600
+                    this.player.setVelocity(0,0);
+                    if (this.player.direction == "down"){
+                        this.player.setVelocityY(600);
+                    }
+                    else if (this.player.direction == "left"){
+                        this.player.setVelocityX(-600);
+                    }
+                    else if (this.player.direction == "up"){
+                        this.player.setVelocityY(-600);
+                    }
+                    else if (this.player.direction == "right"){
+                        this.player.setVelocityX(600);
+                    }
+        }
+    }
 
             if ((this.input.keyboard.checkDown(this.keys.d,9000)==true)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000};
                 if (this.dashVal>0){
@@ -1354,9 +1506,11 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.physics.add.collider(this.player, this.murCassable, casseMur,null,this);
                 this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
                 this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
-                this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+                this.physics.add.overlap(this.player, this.sentinelles, degat, null, this);
                 this.physics.add.overlap(this.player, this.coffre, ouvrirCoffreCle, null, this);
                 this.physics.add.overlap(this.player, this.escalier, passagePlaineD1, null, this);
+                this.physics.add.overlap(this.player, this.pnjSentinelle, pnjSentinelleDialogue, null, this);
+                this.physics.add.overlap(this.player, this.power, powerDash, null, this);
         }
 
         if (this.tete==true && this.compteurTete==0){
@@ -1374,7 +1528,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.physics.add.collider(this.player, this.portes);
             this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
             this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
-            this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+            this.physics.add.overlap(this.player, this.sentinelles, degat, null, this);
             
         }
 
@@ -1415,12 +1569,12 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.scene.start("EcranAccueil");
         }
 
-        if (this.cursors.space.isDown && this.teteDisponible==true){ //si la touche gauche est appuyée
+        if (this.TeteBonton && this.teteDisponible==true){ //si la touche gauche est appuyée
             this.tete=true; //et animation => gauche
         }
 
     if (this.dashVal==0){
-        if (this.cursors.left.isDown){ 
+        if (this.moveLeft){ 
             if (this.tete==true){
                 this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteleft', true);
@@ -1431,7 +1585,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.player.direction = 'left';
             }
 
-        }else if (this.cursors.right.isDown){
+        }else if (this.moveRight){
             if (this.tete==true){
                 this.player.setVelocityX(240+this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteright', true);
@@ -1440,7 +1594,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.player.anims.play('right', true); //et animation => droite
                 this.player.direction = 'right';
                 }
-        }else if (this.cursors.up.isDown){
+        }else if (this.moveUp){
             if (this.tete==true){
                 this.player.setVelocityY(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteup', true);
@@ -1449,7 +1603,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.player.anims.play('up', true);
                 this.player.direction = 'up';
                 }
-        }else if (this.cursors.down.isDown){
+        }else if (this.moveDown){
                 if (this.tete==true){
                     this.player.setVelocityY(240+this.vitesseBonus); //alors vitesse négative en X
                     this.player.anims.play('tetedown', true);
@@ -1478,11 +1632,25 @@ if (this.inventaireAile==true && this.nbAile<1){
                 }
             }
 
+            if (this.padConnected){
+                if (this.paddle.A){
+                    if ( this.paddle.A && this.tete==false && this.tir==true && this.premierFois==false) {
+                    this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
+                    this.proj.vitesse=this.vitesseBonus;
+                    this.premierFois=true;
+                    tirer(this.player,this.proj);
+                    }
+                }else{
+                    this.premierFois=false;
+                }
+            }
+
             if ( Phaser.Input.Keyboard.JustDown(this.keys.a) && this.tete==false && this.tir==true) {
                 this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
                 this.proj.vitesse=this.vitesseBonus;
                 tirer(this.player,this.proj);
             } 
+
         }};
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -1618,7 +1786,7 @@ class Donjon2 extends Phaser.Scene{
                 this.player = this.physics.add.sprite(this.coordPlayerX, this.coordPlayerY, 'persoGolem').setScale(2);
                 this.player.direction = 'right';  
                 this.player.setCollideWorldBounds(true);
-                //this.physics.add.collider(this.player, this.obstacles);
+                this.physics.add.collider(this.player, this.obstacles);
                 this.physics.add.overlap(this.player, this.escalier, passagePlaineD2, null, this);
 
                 this.physics.world.setBounds(0, 0, 6144, 1984);
@@ -1939,6 +2107,37 @@ class Donjon2 extends Phaser.Scene{
 
 
         update(){
+
+            this.input.gamepad.once('connected', function (pad) {
+                this.scene.paddle = pad;
+                this.scene.padConnected = true;
+               // this.tirManette=this.paddle.X;
+            });    
+
+            // quand la manette est connectée, les touches manettes sont activées
+            if (this.padConnected==true) {
+
+                this.moveUp = (this.cursors.up.isDown ||  this.paddle.up ||  (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y<=-0.8));  
+                this.moveRight = (this.cursors.right.isDown ||  this.paddle.left || (this.paddle.rightStick.x>=0.8 && this.paddle.rightStick.y<=0.8 && this.paddle.rightStick.y>=-0.8));
+                this.moveLeft = (this.cursors.left.isDown || this.paddle.right || (this.paddle.rightStick.x<=-0.8 && this.paddle.rightStick.y<=0.8 && this.paddle.rightStick.y>=-0.8));
+                this.moveDown = (this.cursors.down.isDown || this.paddle.up || (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y>=0.8));  
+
+                this.DashBonton=(this.keys.d ||  this.paddle.B);
+                this.TeteBonton=(this.cursors.space.isDown ||  this.paddle.Y);
+                this.tirBonton= (this.keys.a || this.paddle.A);
+                this.InteractionBonton=(this.keys.e.isDown || this.paddle.X);
+
+            }else{
+                this.moveUp = (this.cursors.up.isDown);
+                this.moveLeft = (this.cursors.left.isDown);  
+                this.moveRight = (this.cursors.right.isDown);
+                this.moveDown = (this.cursors.down.isDown);
+                this.tirBonton= this.keys.a;
+                this.DashBonton=(this.keys.d);
+                this.InteractionBonton=(this.keys.e.isDown);
+                this.TeteBonton=(this.cursors.space.isDown);
+            }
+
             if (this.sentinelle1.ia==2){
 
                 if (Phaser.Math.Distance.Between(this.player.x,this.player.y,this.sentinelle1.x,this.sentinelle1.y)<=300){
@@ -2072,10 +2271,34 @@ if (this.sentinelle3.agro==false){
                 this.texteTutoAffichage.anims.play('texteTete', true); //et animation => gauche
                 this.nbtexteAffichage=1;
             }
-            if (this.cursors.space.isDown && this.teteDisponible==true){ 
+            if (this.TeteBonton && this.teteDisponible==true){ 
                 this.texteTutoAffichage.destroy();
                 this.texteTeteAff==false;
             }
+
+            if (this.padConnected==true){
+            if (this.compteurDashbonton!=0){
+            this.compteurDashbonton=this.compteurDashbonton-1;
+            }
+
+            if ((this.paddle.B==true && this.compteurDashbonton==0)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000;this.compteurDashbonton=9};
+                if (this.dashVal>0){
+                    this.dashVal = this.dashVal -600
+                    this.player.setVelocity(0,0);
+                    if (this.player.direction == "down"){
+                        this.player.setVelocityY(600);
+                    }
+                    else if (this.player.direction == "left"){
+                        this.player.setVelocityX(-600);
+                    }
+                    else if (this.player.direction == "up"){
+                        this.player.setVelocityY(-600);
+                    }
+                    else if (this.player.direction == "right"){
+                        this.player.setVelocityX(600);
+                    }
+        }
+    }
 
             if ((this.input.keyboard.checkDown(this.keys.d,9000)==true)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000};
                 if (this.dashVal>0){
@@ -2138,9 +2361,10 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.physics.add.collider(this.player, this.portes);
                 this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
                 this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
-                this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+                this.physics.add.overlap(this.player, this.sentinelles, degat, null, this);
                 this.physics.add.overlap(this.player, this.coffre, ouvrirCoffreCle, null, this);
                 this.physics.add.overlap(this.player, this.escalier, passagePlaineD2, null, this);
+                this.physics.add.collider(this.player, this.murCassable, casseMur,null,this);
         }
 
         if (this.tete==true && this.compteurTete==0){
@@ -2159,7 +2383,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.physics.add.collider(this.player, this.portes);
             this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
             this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
-            this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+            this.physics.add.overlap(this.player, this.sentinelles, degat, null, this);
             
         }
 
@@ -2200,12 +2424,12 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.scene.start("EcranAccueil");
         }
 
-        if (this.cursors.space.isDown && this.teteDisponible==true){ //si la touche gauche est appuyée
+        if (this.TeteBonton && this.teteDisponible==true){ //si la touche gauche est appuyée
             this.tete=true; //et animation => gauche
         }
 
     if (this.dashVal==0){
-        if (this.cursors.left.isDown){ 
+        if (this.moveLeft){ 
             if (this.tete==true){
                 this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteleft', true);
@@ -2216,7 +2440,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.player.direction = 'left';
             }
 
-        }else if (this.cursors.right.isDown){
+        }else if (this.moveRight){
             if (this.tete==true){
                 this.player.setVelocityX(240+this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteright', true);
@@ -2225,7 +2449,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.player.anims.play('right', true); //et animation => droite
                 this.player.direction = 'right';
                 }
-        }else if (this.cursors.up.isDown){
+        }else if (this.moveUp){
             if (this.tete==true){
                 this.player.setVelocityY(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteup', true);
@@ -2234,7 +2458,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.player.anims.play('up', true);
                 this.player.direction = 'up';
                 }
-        }else if (this.cursors.down.isDown){
+        }else if (this.moveDown){
                 if (this.tete==true){
                     this.player.setVelocityY(240+this.vitesseBonus); //alors vitesse négative en X
                     this.player.anims.play('tetedown', true);
@@ -2260,6 +2484,19 @@ if (this.inventaireAile==true && this.nbAile<1){
                 if(this.compttmp<=0){
                     this.player.setAcceleration(0,0);
                     this.player.setVelocity(0,0);
+                }
+            }
+
+            if (this.padConnected){
+                if (this.paddle.A){
+                    if ( this.paddle.A && this.tete==false && this.tir==true && this.premierFois==false) {
+                    this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
+                    this.proj.vitesse=this.vitesseBonus;
+                    this.premierFois=true;
+                    tirer(this.player,this.proj);
+                    }
+                }else{
+                    this.premierFois=false;
                 }
             }
 
@@ -2329,6 +2566,8 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.nbAile=data.nbAile;
             this.nbCle=data.nbCle;
             this.nbOeil=data.nbOeil;
+            this.paddle=data.pad;
+            this.padConnected=data.padConnected;
         }
 
             preload(){
@@ -2515,7 +2754,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.sentinelle.agro=false;
             this.sentinelle.ia=1;
 
-            this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+            this.physics.add.overlap(this.player, this.sentinelles, degat, null, this);
             this.physics.add.collider(this.sentinelles, this.obstacles,changeOrSenti, null,this);
             this.anims.create({
                 key: 'sentinelleUp',
@@ -2621,7 +2860,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.input.gamepad.once('connected', function (pad) {
                 this.scene.paddle = pad;
                 this.scene.padConnected = true;
-               // this.tirManette=this.paddle.X;
+               //console.log("test");
             });    
 
             // quand la manette est connectée, les touches manettes sont activées
@@ -2632,17 +2871,11 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.moveLeft = (this.cursors.left.isDown || this.paddle.right || (this.paddle.rightStick.x<=-0.8 && this.paddle.rightStick.y<=0.8 && this.paddle.rightStick.y>=-0.8));
                 this.moveDown = (this.cursors.down.isDown || this.paddle.up || (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y>=0.8));  
 
-                //this.tirBonton= this.paddle.A;
                 this.DashBonton=(this.keys.d ||  this.paddle.B);
                 this.TeteBonton=(this.cursors.space.isDown ||  this.paddle.Y);
                 this.tirBonton= (this.keys.a || this.paddle.A);
                 this.InteractionBonton=(this.keys.e.isDown || this.paddle.X);
 
-                /*                this.moveUp = (this.cursors.up.isDown ||  this.paddle.up ||  (this.paddle.rightStick.x<=1.2 && this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.y>=-0.8 && this.paddle.rightStick.y<=0.8));  
-                this.moveLeft = (this.cursors.left.isDown ||  this.paddle.up || (this.paddle.rightStick.y>=-0.8 && this.paddle.rightStick.y<=0.8));
-                this.moveRight = (this.cursors.right.isDown || this.paddle.right || (this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.x>=-0.8));
-                this.moveDown = (this.cursors.down.isDown || this.paddle.up || (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y>=-0.8 && this.paddle.rightStick.y<=1.2));
-                */
             }else{
                 this.moveUp = (this.cursors.up.isDown);
                 this.moveLeft = (this.cursors.left.isDown);  
@@ -2743,9 +2976,10 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.physics.add.overlap(this.player, this.porteTuto, sortie, null, this);
                 this.physics.add.collider(this.player, this.obstacles);
                 this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
-                this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+                this.physics.add.overlap(this.player, this.sentinelles, degat, null, this);
                 this.physics.add.overlap(this.player, this.porteTuto, sortie, null, this);
                 this.physics.add.overlap(this.player, this.portail, passagePlaine, null, this);
+                this.physics.add.overlap(this.player, this.power, tutoPower, null, this);
         }
 
         if (this.tete==true && this.compteurTete==0){
@@ -2761,7 +2995,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.physics.add.overlap(this.player, this.porteTuto, sortie, null, this);
             this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
             this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
-            this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+            this.physics.add.overlap(this.player, this.sentinelles, degat, null, this);
         }
 
 
@@ -2985,11 +3219,11 @@ if (this.dashVal==0){
                 if ( this.keys.a.isDown){
                     this.scene.start('Tuto',{
                         vieJoueur:6, 
-                        teteDisponible: true, 
-                        dash:true, 
-                        afficheScore:999999,
+                        teteDisponible: false, 
+                        dash:false, 
+                        afficheScore:0,
                         inventaireAile:false,
-                        inventaireCle:false,
+                        inventaireCle:true,
                         inventaireOeil:false,
                         tir: true,
                         coordPlayerX: 450,
@@ -3230,59 +3464,7 @@ if (this.dashVal==0){
                     key: 'barreVie0',
                     frames: [ { key: 'barreVie', frame: 6 } ],
                     frameRate: 20
-                });
-
-            this.slimes = this.physics.add.group();
-            this.slime = this.physics.add.sprite(500,300, 'slime').setScale(2);
-            this.slimes.add(this.slime);
-            this.slime.vie=100;
-            this.slime.direction='null';
-            this.slime.agro=false;
-            this.physics.add.collider(this.slime, this.obstacles);
-            this.anims.create({
-                key: 'slimeRight',
-                frames: this.anims.generateFrameNumbers('slime', {start:0,end:4}),
-                frameRate: 10,
-                repeat: -1
-            });
-            this.anims.create({
-                key: 'slimeUp',
-                frames: this.anims.generateFrameNumbers('slime', {start:27,end:35}),
-                frameRate: 10,
-                repeat: -1
-            });
-            this.anims.create({
-                key: 'slimeLeft',
-                frames: this.anims.generateFrameNumbers('slime', {start:9,end:13}),
-                frameRate: 10,
-                repeat: -1
-            });
-            this.anims.create({
-                key: 'slimeDown',
-                frames: this.anims.generateFrameNumbers('slime', {start:18,end:26}),
-                frameRate: 10,
-                repeat: -1
-            });
-           this.anims.create({
-                key: 'slimeTurnLeft',
-                frames: [ { key: 'slime', frame: 37 } ],
-                frameRate: 20
-            });
-            this.anims.create({
-                key: 'slimeTurnRight',
-                frames: [ { key: 'slime', frame: 36 } ],
-                frameRate: 20
-            });
-            this.anims.create({
-                key: 'slimeTurnDown',
-                frames: [ { key: 'slime', frame: 38 } ],
-                frameRate: 20
-            });
-            this.anims.create({
-                key: 'slimeTurnUp',
-                frames: [ { key: 'slime', frame: 39 } ],
-                frameRate: 20
-            });
+                })
 
             this.marchant=this.physics.add.sprite(950,350, 'marchant').setScale(2);
             this.anims.create({
@@ -3384,6 +3566,37 @@ if (this.dashVal==0){
 
 
         update(){
+
+            this.input.gamepad.once('connected', function (pad) {
+                this.scene.paddle = pad;
+                this.scene.padConnected = true;
+                console.log("test");
+            });    
+
+            // quand la manette est connectée, les touches manettes sont activées
+            if (this.padConnected==true) {
+
+                this.moveUp = (this.cursors.up.isDown ||  this.paddle.up ||  (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y<=-0.8));  
+                this.moveRight = (this.cursors.right.isDown ||  this.paddle.left || (this.paddle.rightStick.x>=0.8 && this.paddle.rightStick.y<=0.8 && this.paddle.rightStick.y>=-0.8));
+                this.moveLeft = (this.cursors.left.isDown || this.paddle.right || (this.paddle.rightStick.x<=-0.8 && this.paddle.rightStick.y<=0.8 && this.paddle.rightStick.y>=-0.8));
+                this.moveDown = (this.cursors.down.isDown || this.paddle.up || (this.paddle.rightStick.x>=-0.8 && this.paddle.rightStick.x<=0.8 && this.paddle.rightStick.y>=0.8));  
+
+                this.DashBonton=(this.keys.d ||  this.paddle.B);
+                this.TeteBonton=(this.cursors.space.isDown ||  this.paddle.Y);
+                this.tirBonton= (this.keys.a || this.paddle.A);
+                this.InteractionBonton=(this.keys.e.isDown || this.paddle.X);
+
+            }else{
+                this.moveUp = (this.cursors.up.isDown);
+                this.moveLeft = (this.cursors.left.isDown);  
+                this.moveRight = (this.cursors.right.isDown);
+                this.moveDown = (this.cursors.down.isDown);
+                this.tirBonton= this.keys.a;
+                this.DashBonton=(this.keys.d);
+                this.InteractionBonton=(this.keys.e.isDown);
+                this.TeteBonton=(this.cursors.space.isDown);
+            }
+
             if (this.achatVert==true){
                 this.degatBoule=20;
             }
@@ -3411,6 +3624,30 @@ if (this.dashVal==0){
                 this.vieArmure.setScrollFactor(0);
                 this.nbArmure=1;
             }
+
+            if (this.padConnected==true){
+            if (this.compteurDashbonton!=0){
+            this.compteurDashbonton=this.compteurDashbonton-1;
+            }
+
+            if ((this.paddle.B==true && this.compteurDashbonton==0)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000;this.compteurDashbonton=9};
+                if (this.dashVal>0){
+                    this.dashVal = this.dashVal -600
+                    this.player.setVelocity(0,0);
+                    if (this.player.direction == "down"){
+                        this.player.setVelocityY(600);
+                    }
+                    else if (this.player.direction == "left"){
+                        this.player.setVelocityX(-600);
+                    }
+                    else if (this.player.direction == "up"){
+                        this.player.setVelocityY(-600);
+                    }
+                    else if (this.player.direction == "right"){
+                        this.player.setVelocityX(600);
+                    }
+        }
+    }
 
             if ((this.input.keyboard.checkDown(this.keys.d,9000)==true)&&(this.dashVal==0)&& this.dash==true){this.dashVal=9000};
                 if (this.dashVal>0){
@@ -3456,38 +3693,6 @@ if (this.inventaireAile==true && this.nbAile<1){
             }
 
 
-            if (Phaser.Math.Distance.Between(this.player.x,this.player.y,this.slime.x,this.slime.y)<=100){
-                this.slime.agro=true;
-            }else{
-                this.slime.agro=false;
-            }
-
-
-   
-
-        if (this.slime.x>this.player.x && this.slime.agro==true){
-                this.slime.setVelocityX(-150); //alors vitesse négative en X
-                this.slime.anims.play('slimeLeft', true);
-            }
-            if (this.slime.x<this.player.x && this.slime.agro==true){
-                this.slime.setVelocityX(150); //alors vitesse négative en X
-                this.slime.anims.play('slimeRight', true);
-            }
-            if (this.slime.y>this.player.y && this.slime.agro==true){
-                this.slime.setVelocityY(-150); //alors vitesse négative en X
-                this.slime.anims.play('slimeUp', true);
-            }
-            if (this.slime.y<this.player.y && this.slime.agro==true){
-                this.slime.setVelocityY(150); //alors vitesse négative en X
-                this.slime.anims.play('slimeDown', true);
-            }
-            if (this.slime.agro==false){
-                this.slime.setVelocity(0,0);
-                this.slime.anims.play('slimeTurnDown', true);
-            }
-
-
-
             if (this.nouveauJoueur==true){
                 this.nouveauJoueur=false;
                 this.player.destroy();
@@ -3506,6 +3711,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
                 this.physics.add.overlap(this.player, this.escalierPlaine, passageDonjon, null, this);
                 this.physics.add.overlap(this.player, this.portail, passageTuto, null, this);
+                this.physics.add.overlap(this.player, this.marchandises, achatMarchandises, null, this);
                 
         }
 
@@ -3523,6 +3729,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.physics.add.overlap(this.player, this.carcasse, retourCorps, null, this);
             this.physics.add.collider(this.player, this.loot, recupLoot, null, this);
             this.physics.add.collider(this.player, this.sentinelles, degat, null, this);
+            
         }
 
         if(this.invincible == true){
@@ -3562,12 +3769,12 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.scene.start("EcranAccueil");
         }
 
-        if (this.cursors.space.isDown && this.teteDisponible==true){ //si la touche gauche est appuyée
+        if (this.TeteBonton && this.teteDisponible==true){ //si la touche gauche est appuyée
             this.tete=true; //et animation => gauche
         }
 
     if (this.dashVal==0){
-        if (this.cursors.left.isDown){ 
+        if (this.moveLeft){ 
             if (this.tete==true){
                 this.player.setVelocityX(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteleft', true);
@@ -3578,7 +3785,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             this.player.direction = 'left';
             }
 
-        }else if (this.cursors.right.isDown){
+        }else if (this.moveRight){
             if (this.tete==true){
                 this.player.setVelocityX(240+this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteright', true);
@@ -3587,7 +3794,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.player.anims.play('right', true); //et animation => droite
                 this.player.direction = 'right';
                 }
-        }else if (this.cursors.up.isDown){
+        }else if (this.moveUp){
             if (this.tete==true){
                 this.player.setVelocityY(-240-this.vitesseBonus); //alors vitesse négative en X
                 this.player.anims.play('teteup', true);
@@ -3596,7 +3803,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.player.anims.play('up', true);
                 this.player.direction = 'up';
                 }
-        }else if (this.cursors.down.isDown){
+        }else if (this.moveDown){
                 if (this.tete==true){
                     this.player.setVelocityY(240+this.vitesseBonus); //alors vitesse négative en X
                     this.player.anims.play('tetedown', true);
@@ -3622,6 +3829,19 @@ if (this.inventaireAile==true && this.nbAile<1){
                 if(this.compttmp<=0){
                     this.player.setAcceleration(0,0);
                     this.player.setVelocity(0,0);
+                }
+            }
+
+            if (this.padConnected){
+                if (this.paddle.A){
+                    if ( this.paddle.A && this.tete==false && this.tir==true && this.premierFois==false) {
+                    this.proj=this.projectileP.create(this.player.x, this.player.y, 'projectileP').setScale(2);
+                    this.proj.vitesse=this.vitesseBonus;
+                    this.premierFois=true;
+                    tirer(this.player,this.proj);
+                    }
+                }else{
+                    this.premierFois=false;
                 }
             }
 
@@ -3729,17 +3949,23 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.scoreArgent.setText(': ' + this.afficheScore);
                 this.scoreArgent.updateText();
                 //coffre.disableBody(true, true);
+                if (sentinelle.id=="11111"){
+                    this.sentinelle1App=false;
+                }
+                if (sentinelle.id=="22222"){
+                    this.sentinelle2App=false;
+                } 
                 if (this.compteurEnnemiDonjon1>=1){
                     this.compteurEnnemiDonjon1=this.compteurEnnemiDonjon1+1;
                 }
-                if (Math.floor(Math.random() * 20)<=100){
+                if (Math.floor(Math.random() * 100)<=20){
                     this.aile=this.loot.create(sentinelle.x, sentinelle.y, 'lootAile');
                     this.aile.nom="aile";
                 }
             }
         }
         function ouvrirCoffreCle(player,coffre){
-            if (this.keys.e.isDown){
+            if (this.InteractionBonton){
                 this.cle=this.loot.create(coffre.x, coffre.y, 'cle').setScale(2);
                 this.cle.nom="cle";
                 coffre.destroy();
@@ -3771,7 +3997,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             }
         }
         function passagePlaineD2(player,escalier){
-        if ( this.keys.e.isDown){
+        if ( this.InteractionBonton){
             this.scene.start('Plaine',{
                 vieJoueur:this.vieJoueur,
                 teteDisponible: this.teteDisponible, 
@@ -3795,7 +4021,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             }
         }
         function passagePlaineD1(player,escalier){
-        if ( this.keys.e.isDown){
+        if ( this.InteractionBonton){
             this.scene.start('Plaine',{
                 vieJoueur:this.vieJoueur,
                 teteDisponible: this.teteDisponible, 
@@ -3821,7 +4047,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             }
         }
         function passageTuto(player,portail){
-        if ( this.keys.e.isDown){
+        if ( this.InteractionBonton){
             this.scene.start('Tuto',{
                 vieJoueur:this.vieJoueur,
                 teteDisponible: this.teteDisponible, 
@@ -3841,11 +4067,13 @@ if (this.inventaireAile==true && this.nbAile<1){
                 nbCle:0,
                 nbAile:0,
                 nbOeil:0,
+                pad: this.paddle,
+                padConnected : this.padConnected,
         });
             }
         }
         function passageDonjon(player,escalierPlaine){
-        if ( this.keys.e.isDown && escalierPlaine.x==200 && escalierPlaine.y==1000){
+        if ( this.InteractionBonton && escalierPlaine.x==200 && escalierPlaine.y==1000){
             this.scene.start('Donjon2',{
                 vieJoueur:this.vieJoueur,
                 teteDisponible: this.teteDisponible, 
@@ -3867,7 +4095,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 nbOeil:0,
         });
             }
-            if ( this.keys.e.isDown && escalierPlaine.x==900 && escalierPlaine.y==1000){
+            if ( this.InteractionBonton && escalierPlaine.x==900 && escalierPlaine.y==1000){
             this.scene.start('Donjon1',{
                 vieJoueur:this.vieJoueur,
                 teteDisponible: this.teteDisponible, 
@@ -3891,7 +4119,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             }
         }
         function sortie(player,porteTuto){
-            if ( this.keys.e.isDown && this.inventaireCle==true){
+            if (this.InteractionBonton && this.inventaireCle==true){
                 this.scene.start('SalleBoss',{
                 vieJoueur:this.vieJoueur,
                 teteDisponible: this.teteDisponible, 
@@ -3901,8 +4129,8 @@ if (this.inventaireAile==true && this.nbAile<1){
                 inventaireAile:this.inventaireAile,
                 inventaireOeil:this.inventaireOeil,
                 tir:this.tir,
-                coordPlayerX: 1200,
-                coordPlayerY: 230,
+                coordPlayerX: 200,
+                coordPlayerY: 1000,
                 degatBoule:this.degatBoule,
                 vitesseBonus: this.vitesseBonus,
                 armorUnlock:this.armorUnlock,
@@ -3938,7 +4166,7 @@ if (this.inventaireAile==true && this.nbAile<1){
         }
 
         function retourCorps(player,carcasse){
-            if (this.keys.e.isDown){
+            if (this.InteractionBonton){
                 this.compteurTete=0;
                 this.tete=false;
                 this.nouveauJoueur=true;
@@ -3948,7 +4176,11 @@ if (this.inventaireAile==true && this.nbAile<1){
         }
 
         function pnjSentinelleDialogue(player,pnjSentinelle){
-            if (this.keys.e.isDown && this.nbAileMax>=4){
+            if (this.texteDialogue!=true){
+            this.texteSentinelle.create(850, 1600, 'texteSentinelle').setScale(2).setDepth(3);
+            this.texteDialogue=true;
+            }
+            if (this.InteractionBonton && this.nbAileMax>=4){
                 this.nbAileMax=this.nbAileMax-4;  
                 if(this.nbAileMax==0){
                     this.imgInventaire1.destroy();
@@ -3960,11 +4192,12 @@ if (this.inventaireAile==true && this.nbAile<1){
                     this.nbAileInventaire.updateText();
                 }
                 this.pnjSentinelle.anims.play('pnjSentinelleReparer', true);
+                this.queteFini=true;
             }
         }
 
         function achatMarchandises(player,marchandise){
-            if (this.keys.e.isDown && marchandise.prix<this.afficheScore){
+            if (this.InteractionBonton && marchandise.prix<this.afficheScore){
             this.afficheScore=this.afficheScore-marchandise.prix;
             this.scoreArgent.setText(': ' + this.afficheScore);
             this.scoreArgent.updateText();
@@ -3976,7 +4209,7 @@ if (this.inventaireAile==true && this.nbAile<1){
                 this.achatOrange=true;
             }
             }
-            if (this.keys.e.isDown && this.inventaireOeil==true && marchandise.id=="violet"){
+            if (this.InteractionBonton && this.inventaireOeil==true && marchandise.id=="violet"){
             this.achatViolet=true;
             this.inventaireOeil=false;
             this.imgInventaire3.destroy();
@@ -3985,7 +4218,7 @@ if (this.inventaireAile==true && this.nbAile<1){
         }
 
         function powerDash(player,power){
-            if (this.keys.e.isDown){
+            if (this.InteractionBonton){
             this.dash=true;
             power.disableBody(true, true);
             this.murBloqueur.create(800, 1120, 'murPorteVerticale').setScale(2).refreshBody();
@@ -4052,7 +4285,7 @@ if (this.inventaireAile==true && this.nbAile<1){
 
 
         function powerTete(player,power){
-            if (this.keys.e.isDown){
+            if (this.InteractionBonton){
             this.teteDisponible=true;
             this.texteTeteAff=true;
             power.disableBody(true, true);
@@ -4061,7 +4294,7 @@ if (this.inventaireAile==true && this.nbAile<1){
 
         function tutoPower(player,power){
             this.texteIntAff=true;
-            if (this.keys.e.isDown && this.texteTirAff==false){
+            if (this.InteractionBonton && this.texteTirAff==false){
             this.tir=true;
             this.texteTirAff=true;
             this.nbtexteAffichage=2;
@@ -4070,7 +4303,7 @@ if (this.inventaireAile==true && this.nbAile<1){
         }
     
         function degat(player){
-            console.log("dddd");
+
             if (this.invincible==false){
                 this.invincible=true;
                 if (this.armor==true){
@@ -4083,7 +4316,6 @@ if (this.inventaireAile==true && this.nbAile<1){
         }
 
         function recupLoot(player,loot){
-            console.log(loot.nom);
             loot.destroy();
             if (loot.nom=="cle"){
                 //this.imgInventaire = this.physics.add.sprite(this.barreVie.x-30+(64*this.nbElementInventaire), this.barreVie.y+450, 'inventaireCle').setScale(2).setDepth(0);
@@ -4144,7 +4376,7 @@ if (this.inventaireAile==true && this.nbAile<1){
             physics: {
                 default: 'arcade',
                 arcade: {
-                debug: true
+                debug: false
             }},
             input : {gamepad:true},
             scene: [EcranAccueil,Tuto,Plaine,Donjon1,Donjon2,SalleBoss]
